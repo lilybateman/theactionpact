@@ -110,6 +110,13 @@
     @apply font-hand text-lg leading-tight mb-2;
   }
 
+  /* Required symbol: show an asterisk for labels preceding required fields */
+  .scribble-label:has(+ input[required])::after,
+  .scribble-label:has(+ textarea[required])::after,
+  .scribble-label:has(+ select[required])::after {
+    content: " *";
+  }
+
   .scribble-input {
     @apply w-full bg-transparent border-2 border-foreground rounded-md px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-4 focus:ring-primary/20 transition-transform duration-200;
   }
