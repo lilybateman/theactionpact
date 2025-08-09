@@ -70,7 +70,8 @@ export default {
 			},
 			fontFamily: {
 				display: ['var(--font-display)'],
-				hand: ['var(--font-hand)']
+				hand: ['var(--font-hand)'],
+				body: ['var(--font-body)']
 			},
 			keyframes: {
 				'accordion-down': {

@@ -48,6 +48,7 @@
     /* Fonts */
     --font-display: "Fraunces", ui-serif, Georgia, serif;
     --font-hand: "Kalam", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    --font-body: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
   }
 
   .dark {
@@ -95,7 +96,7 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased font-body tracking-tight;
     background-image:
       radial-gradient(1200px 400px at 50% -10%, hsl(var(--primary) / 0.08), transparent 70%),
       url('/images/paper-texture.jpg');
