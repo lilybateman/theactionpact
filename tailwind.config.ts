@@ -71,7 +71,10 @@ export default {
 			fontFamily: {
 				display: ['var(--font-display)'],
 				hand: ['var(--font-hand)'],
-				body: ['var(--font-body)']
+				body: ['var(--font-body)'],
+				artsy: ['var(--font-artsy)'],
+				handwritten: ['var(--font-handwritten)'],
+				marker: ['var(--font-marker)']
 			},
 			keyframes: {
 				'accordion-down': {

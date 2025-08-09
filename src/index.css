@@ -48,7 +48,10 @@
     /* Fonts */
     --font-display: "Fraunces", ui-serif, Georgia, serif;
     --font-hand: "Kalam", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
-    --font-body: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    --font-body: "Cooper", "Cooper Std", "Cooper Black", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    --font-artsy: "Caveat", "Indie Flower", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    --font-handwritten: "Architects Daughter", "Shadows Into Light", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    --font-marker: "Permanent Marker", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
   }
 
   .dark {
@@ -94,21 +97,28 @@
   * {
     @apply border-border;
   }
+  
+  html, body {
+    overflow-x: hidden;
+  }
 
   body {
-    @apply bg-background text-foreground antialiased font-body tracking-tight;
+    @apply bg-background text-foreground antialiased tracking-tight;
+    font-family: "Fraunces", ui-serif, Georgia, serif;
     background-image:
       radial-gradient(1200px 400px at 50% -10%, hsl(var(--primary) / 0.08), transparent 70%),
       url('/images/paper-texture.jpg');
-    background-size: 100% auto, 1200px auto;
-    background-repeat: no-repeat, repeat;
+    background-size: 100% auto, cover;
+    background-repeat: no-repeat, no-repeat;
+    background-position: center, center;
     background-attachment: scroll, fixed;
   }
 }
 
 @layer components {
   .scribble-label {
-    @apply font-hand text-lg leading-tight mb-2;
+    @apply text-lg leading-tight mb-2;
+    font-family: "Fraunces", ui-serif, Georgia, serif;
   }
 
   /* Required symbol: show an asterisk for labels preceding required fields */
@@ -123,14 +133,82 @@
   }
 
   .scribble-input {
-    @apply w-full bg-transparent border-2 border-foreground rounded-md px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-4 focus:ring-primary/20 transition-transform duration-200;
+    @apply w-full bg-transparent border-2 border-foreground rounded-md px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none transition-all duration-200;
+    border-width: 3px;
+    position: relative;
+  }
+
+  .scribble-input:focus {
+    box-shadow: 0 6px 0 0 hsl(var(--primary));
   }
 
   .scribble-button {
-    @apply inline-flex items-center justify-center border-2 border-foreground rounded-full px-10 py-4 font-semibold tracking-wide bg-primary/10 hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 motion-safe:hover:animate-wiggle transition-transform duration-200;
+    @apply inline-flex items-center justify-center border-2 border-foreground px-6 py-4 text-xl tracking-wide bg-transparent hover:bg-foreground hover:text-background focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 transition-all duration-300 transform hover:scale-105 active:scale-95;
+    border-radius: 50px;
+    border-width: 3px;
+    position: relative;
+    background: transparent;
+    border-style: solid;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: "Fraunces", ui-serif, Georgia, serif;
   }
+
+
+
+
 
   .display-title {
     @apply font-display;
+  }
+
+  .artsy-text {
+    @apply font-artsy tracking-wide;
+  }
+
+  .handwritten-text {
+    @apply font-handwritten tracking-wide;
+  }
+
+  .marker-text {
+    @apply tracking-wide;
+    font-family: "Fraunces", ui-serif, Georgia, serif;
+  }
+
+  .language-toggle {
+    @apply text-xl px-6 py-4 border-2 border-foreground bg-transparent hover:bg-foreground transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary/20 transform hover:scale-105 active:scale-95 tracking-wide;
+    border-radius: 50px;
+    border-width: 3px;
+    position: relative;
+    background: transparent;
+    border-style: solid;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: "Fraunces", ui-serif, Georgia, serif;
+  }
+
+  .language-toggle:hover span:not(.text-primary) {
+    @apply text-background;
+  }
+
+  /* Autocomplete dropdown styles */
+  .autocomplete-dropdown {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--foreground)) transparent;
+  }
+
+  .autocomplete-dropdown::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .autocomplete-dropdown::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .autocomplete-dropdown::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--foreground));
+    border-radius: 4px;
+  }
+
+  .autocomplete-dropdown::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--primary));
   }
 }
