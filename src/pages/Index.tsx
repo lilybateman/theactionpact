@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Leaf } from "lucide-react";
+
 import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
@@ -55,7 +55,7 @@ const Index = () => {
                 <input id="name" name="name" type="text" className="scribble-input" placeholder="Your name" autoComplete="name" />
               </div>
               <div>
-                <label htmlFor="email" className="scribble-label flex items-center gap-2">Email <Leaf className="h-4 w-4 text-primary" aria-hidden /></label>
+                <label htmlFor="email" className="scribble-label">Email</label>
                 <input id="email" name="email" type="email" required className="scribble-input" placeholder="you@example.com" autoComplete="email" />
               </div>
               <div>
