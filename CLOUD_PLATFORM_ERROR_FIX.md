@@ -110,3 +110,4 @@ Once you get past this error:
 4. **Test the integration** with a form submission
 
 **The Cloud Platform error is just a temporary Google issue - it will resolve!** 🚀
+

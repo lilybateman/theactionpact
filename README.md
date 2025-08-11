@@ -1,73 +1,85 @@
-# Welcome to your Lovable project
+# The Action Pact
 
-## Project info
+A bilingual (English/French) newsletter signup website for The Action Pact.
 
-**URL**: https://lovable.dev/projects/8bcf0011-cb27-46a3-a6c6-93942b9d6e9b
+## Features
 
-## How can I edit this code?
+- **Bilingual Support**: English and French language toggle
+- **Responsive Design**: Optimized for both desktop and mobile devices
+- **Form Validation**: Email validation and city autocomplete
+- **Modern UI**: Clean, professional design with custom styling
 
-There are several ways of editing your application.
+## Getting Started
 
-**Use Lovable**
+### Prerequisites
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/8bcf0011-cb27-46a3-a6c6-93942b9d6e9b) and start prompting.
+- Node.js (version 16 or higher)
+- npm or bun
 
-Changes made via Lovable will be committed automatically to this repo.
+### Installation
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+1. Clone the repository:
+```bash
+git clone <your-repo-url>
+cd theactionpact
 ```
 
-**Edit a file directly in GitHub**
+2. Install dependencies:
+```bash
+npm install
+# or
+bun install
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+3. Start the development server:
+```bash
+npm run dev
+# or
+bun dev
+```
 
-**Use GitHub Codespaces**
+4. Open your browser and navigate to `http://localhost:8080`
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Development
 
-## What technologies are used for this project?
+- **Frontend**: React with TypeScript
+- **Styling**: Tailwind CSS with custom components
+- **Build Tool**: Vite
 
-This project is built with:
+## Building for Production
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```bash
+npm run build
+# or
+bun run build
+```
 
-## How can I deploy this project?
+## Deployment
 
-Simply open [Lovable](https://lovable.dev/projects/8bcf0011-cb27-46a3-a6c6-93942b9d6e9b) and click on Share -> Publish.
+The built files in the `dist` directory can be deployed to any static hosting service like:
+- Netlify
+- Vercel
+- GitHub Pages
+- AWS S3
 
-## Can I connect a custom domain to my Lovable project?
+## Project Structure
 
-Yes, you can!
+```
+src/
+├── components/     # Reusable UI components
+├── pages/         # Page components
+├── hooks/         # Custom React hooks
+├── lib/           # Utility functions
+└── integrations/  # External service integrations
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Contributing
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## License
+
+[Your chosen license]

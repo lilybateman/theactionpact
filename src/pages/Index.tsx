@@ -1,22 +1,50 @@
 import { useState, useRef, useEffect } from "react";
 
 import { useToast } from "@/hooks/use-toast";
+import ActionPactLogo from "@/components/ActionPactLogo";
 
-// Cities list for autocomplete
-const cities = [
-  "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", "San Antonio", "San Diego", "Dallas", "San Jose",
-  "Austin", "Jacksonville", "Fort Worth", "Columbus", "Charlotte", "San Francisco", "Indianapolis", "Seattle", "Denver", "Washington",
-  "Boston", "El Paso", "Nashville", "Detroit", "Oklahoma City", "Portland", "Las Vegas", "Memphis", "Louisville", "Baltimore",
-  "Milwaukee", "Albuquerque", "Tucson", "Fresno", "Sacramento", "Atlanta", "Kansas City", "Long Beach", "Colorado Springs", "Raleigh",
-  "Miami", "Virginia Beach", "Omaha", "Oakland", "Minneapolis", "Tampa", "Tulsa", "Arlington", "New Orleans", "Wichita",
-  "Cleveland", "Bakersfield", "Aurora", "Anaheim", "Honolulu", "Santa Ana", "Corpus Christi", "Riverside", "Lexington", "Stockton",
-  "Henderson", "Saint Paul", "St. Louis", "Fort Wayne", "Jersey City", "Chandler", "Madison", "Lubbock", "Scottsdale", "Reno",
-  "Buffalo", "Gilbert", "Glendale", "North Las Vegas", "Winston-Salem", "Chesapeake", "Norfolk", "Fremont", "Garland", "Irving",
-  "Hialeah", "Richmond", "Boise", "Spokane", "Baton Rouge", "Tacoma", "San Bernardino", "Grand Rapids", "Huntsville", "Salt Lake City",
-  "Frisco", "Cary", "Yonkers", "Amarillo", "Glendale", "McKinney", "Rochester", "Aurora", "Akron", "Modesto",
-  "Montreal", "Toronto", "Vancouver", "Calgary", "Edmonton", "Ottawa", "Winnipeg", "Quebec City", "Hamilton", "Kitchener",
-  "London", "Paris", "Berlin", "Madrid", "Rome", "Amsterdam", "Barcelona", "Milan", "Vienna", "Prague",
-  "Budapest", "Warsaw", "Bucharest", "Belgrade", "Sofia", "Athens", "Stockholm", "Copenhagen", "Oslo", "Helsinki"
+  // Cities list for autocomplete - separate arrays for English and French
+const englishCities = [
+  "Toronto", "Montreal", "Vancouver", "Calgary", "Edmonton", "Ottawa", "Winnipeg", "Quebec City", "Hamilton", "Kitchener",
+  "London", "Victoria", "Halifax", "Oshawa", "Windsor", "Saskatoon", "Regina", "St. John's", "Kelowna", "Kingston",
+  "Sherbrooke", "Guelph", "Thunder Bay", "Moncton", "Saint John", "Peterborough", "Sault Ste. Marie", "Timmins", "North Bay", "Sudbury",
+  "Trois-Rivières", "Laval", "Gatineau", "Longueuil", "Brossard", "Saguenay", "Lévis", "Surrey", "Burnaby", "Richmond",
+  "Abbotsford", "Coquitlam", "Nanaimo", "Kamloops", "Prince George", "Fort St. John", "Whitehorse", "Yellowknife", "Iqaluit", "Fredericton",
+  "Charlottetown", "Sydney", "Dartmouth", "Brampton", "Mississauga", "Markham", "Vaughan", "Richmond Hill", "Oakville", "Burlington",
+  "St. Catharines", "Niagara Falls", "Windsor", "Sarnia", "Thunder Bay", "Sudbury", "North Bay", "Timmins", "Sault Ste. Marie", "Timmins",
+  "Barrie", "Orillia", "Peterborough", "Belleville", "Kingston", "Brockville", "Cornwall", "Hawkesbury", "Gatineau", "Ottawa",
+];
+
+const frenchCities = [
+  "Montréal", "Ville de Québec", "Trois-Rivières", "Sherbrooke", "Laval", "Gatineau", "Longueuil", "Brossard", "Saguenay", "Lévis",
+  "Saint-Jean-sur-Richelieu", "Saint-Hyacinthe", "Joliette", "Saint-Jérôme", "Sainte-Thérèse", "Blainville", "Mirabel", "Saint-Eustache",
+  "Repentigny", "Dollard-des-Ormeaux", "Pointe-Claire", "Kirkland", "Beaconsfield", "Baie-D'Urfé", "Sainte-Anne-de-Bellevue", "Senneville",
+  "Dorval", "Pincourt", "Vaudreuil-Dorion", "Saint-Lazare", "Hudson", "Rigaud", "Vaudreuil-sur-le-Lac", "Pointe-Calumet", "Saint-Joseph-du-Lac",
+  "Oka", "Saint-Placide", "Saint-Canut", "Saint-Benoît", "Sainte-Scholastique", "Saint-Janvier", "Lachute", "Brownsburg-Chatham", "Grenville",
+  "Calumet", "Carillon", "Saint-André-d'Argenteuil", "Gore", "Mille-Isles", "Wentworth", "Morin-Heights", "Piedmont", "Sainte-Adèle",
+  "Sainte-Marguerite", "Val-Morin", "Val-David", "Sainte-Lucie-des-Laurentides", "Mont-Tremblant", "Labelle", "La Conception", "La Minerve",
+  "Lantier", "Val-des-Lacs", "Lac-Supérieur", "Arundel", "Wentworth-Nord", "Saint-Sauveur", "Prévost", "Saint-Hippolyte", "Ville de Toronto",
+  "Ville de Vancouver", "Ville de Calgary", "Ville d'Edmonton", "Ville d'Ottawa", "Ville de Winnipeg", "Ville de Hamilton", "Ville de Kitchener",
+  "Ville de London", "Ville de Victoria", "Ville d'Halifax", "Ville d'Oshawa", "Ville de Windsor", "Ville de Saskatoon", "Ville de Regina",
+  "Saint-Jean de Terre-Neuve", "Ville de Kelowna", "Ville de Kingston", "Ville de Guelph", "Baie du Tonnerre", "Ville de Moncton",
+  "Saint-Jean", "Ville de Peterborough", "Sault-Sainte-Marie", "Ville de Timmins", "Ville de North Bay", "Ville de Sudbury", "Ville de Surrey",
+  "Ville de Burnaby", "Ville de Richmond", "Ville d'Abbotsford", "Ville de Coquitlam", "Ville de Nanaimo", "Ville de Kamloops",
+  "Ville de Prince George", "Fort-Saint-Jean", "Cheval Blanc", "Ville de Yellowknife", "Ville d'Iqaluit", "Ville de Fredericton",
+  "Ville de Charlottetown", "Ville de Sydney", "Ville de Dartmouth", "Ville de Brampton", "Ville de Mississauga", "Ville de Markham",
+  "Ville de Vaughan", "Ville de Richmond Hill", "Ville d'Oakville", "Ville de Burlington", "Sainte-Catherine", "Chutes du Niagara",
+  "Ville de Sarnia", "Ville de Barrie", "Ville d'Orillia", "Ville de Belleville", "Ville de Brockville", "Ville de Cornwall",
+  "Ville de Hawkesbury", "Ville de Saint-Jean-sur-Richelieu", "Ville de Saint-Hyacinthe", "Ville de Joliette", "Ville de Saint-Jérôme",
+  "Ville de Sainte-Thérèse", "Ville de Blainville", "Ville de Mirabel", "Ville de Saint-Eustache", "Ville de Repentigny",
+  "Ville de Dollard-des-Ormeaux", "Ville de Pointe-Claire", "Ville de Kirkland", "Ville de Beaconsfield", "Ville de Baie-D'Urfé",
+  "Ville de Sainte-Anne-de-Bellevue", "Ville de Senneville", "Ville de Dorval", "Ville de Pincourt", "Ville de Vaudreuil-Dorion",
+  "Ville de Saint-Lazare", "Ville de Hudson", "Ville de Rigaud", "Ville de Vaudreuil-sur-le-Lac", "Ville de Pointe-Calumet",
+  "Ville de Saint-Joseph-du-Lac", "Ville d'Oka", "Ville de Saint-Placide", "Ville de Saint-Canut", "Ville de Saint-Benoît",
+  "Ville de Sainte-Scholastique", "Ville de Saint-Janvier", "Ville de Lachute", "Ville de Brownsburg-Chatham", "Ville de Grenville",
+  "Ville de Calumet", "Ville de Carillon", "Ville de Saint-André-d'Argenteuil", "Ville de Gore", "Ville de Mille-Isles",
+  "Ville de Wentworth", "Ville de Morin-Heights", "Ville de Piedmont", "Ville de Sainte-Adèle", "Ville de Sainte-Marguerite",
+  "Ville de Val-Morin", "Ville de Val-David", "Ville de Sainte-Lucie-des-Laurentides", "Ville de Mont-Tremblant", "Ville de Labelle",
+  "Ville de La Conception", "Ville de La Minerve", "Ville de Lantier", "Ville de Val-des-Lacs", "Ville de Lac-Supérieur",
+  "Ville d'Arundel", "Ville de Wentworth-Nord", "Ville de Saint-Sauveur", "Ville de Prévost", "Ville de Saint-Hippolyte"
 ];
 
 // Translations
@@ -44,9 +72,9 @@ const translations = {
   },
   fr: {
     title: "Le Pacte d'Action",
-    subtitle: "Rejoignez l'Action.",
+    subtitle: "Participez à l'action.",
     name: "Nom",
-    email: "Email",
+    email: "Courriel",
     city: "Ville",
     submit: "Soumettre",
     submitting: "Soumission...",
@@ -78,12 +106,17 @@ const Index = () => {
 
   const t = translations[language];
 
-  // Filter cities based on input
+  // Filter cities based on input and language preference
   const filterCities = (input: string) => {
     if (!input.trim()) return [];
-    const filtered = cities.filter(city => 
+    
+    // Use the appropriate city array based on language
+    const citiesToSearch = language === 'fr' ? frenchCities : englishCities;
+    
+    const filtered = citiesToSearch.filter(city => 
       city.toLowerCase().includes(input.toLowerCase())
     );
+    
     return filtered.slice(0, 8); // Limit to 8 suggestions
   };
 
@@ -150,46 +183,9 @@ const Index = () => {
   const GOOGLE_SHEETS_WEBHOOK_URL = import.meta.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL || 'https://script.google.com/a/macros/theactionpact.ca/s/AKfycbxfmKPkA6i7zxVzm8JIPgXtKBxNwCxEjFktzraMMtyO0PhIbDorHxXPebSKWH1cNQM9/exec';
 
   const sendToGoogleSheets = async (name: string, email: string, city: string) => {
-    // Skip if no webhook URL is configured or if it's the default URL
-    if (!GOOGLE_SHEETS_WEBHOOK_URL || 
-        GOOGLE_SHEETS_WEBHOOK_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEBHOOK_URL_HERE' ||
-        GOOGLE_SHEETS_WEBHOOK_URL.includes('YOUR_ACTUAL_SCRIPT_ID')) {
-      console.log('Google Sheets webhook URL not configured, skipping...');
-      return true;
-    }
-
-    try {
-      console.log('Sending to Google Sheets:', { name, email, city, url: GOOGLE_SHEETS_WEBHOOK_URL });
-      
-      const response = await fetch(GOOGLE_SHEETS_WEBHOOK_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          city,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      console.log('Google Sheets response:', result);
-      
-      if (!result.success) {
-        console.error('Failed to send to Google Sheets:', result.error);
-        return false;
-      }
-      
-      return true;
-    } catch (error) {
-      console.error('Error sending to Google Sheets:', error);
-      return false;
-    }
+    // Temporarily disabled - Google Sheets integration commented out
+    console.log('Google Sheets integration temporarily disabled');
+    return true; // Return success so form still works
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -247,10 +243,10 @@ const Index = () => {
 
   return (
     <>
-      <header className="container py-6 flex items-center justify-end">
+      <header className="container py-4 md:py-6 flex items-center justify-end">
         <button
           onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')}
-          className="language-toggle"
+          className="language-toggle py-2 md:py-3 text-sm md:text-base"
           aria-label={`Switch to ${language === 'en' ? 'French' : 'English'}`}
         >
           <span className={language === 'fr' ? 'text-primary' : 'text-foreground'}>FR</span>
@@ -260,42 +256,31 @@ const Index = () => {
       </header>
       <main>
         <section className="container pb-24 pt-2">
-          <h1 className="display-title text-primary text-6xl sm:text-7xl md:text-8xl leading-[0.9] tracking-tight">
-            {language === 'en' ? (
-              <>
-                The<br />
-                Action<br />
-                Pact<span className="text-primary">.</span>
-              </>
-            ) : (
-              <>
-                Le<br />
-                Pacte<br />
-                d'Action<span className="text-primary">.</span>
-              </>
-            )}
-            <span className="sr-only"> — Newsletter Signup</span>
-          </h1>
+                  <div className="flex justify-start mb-8 md:mb-12">
+          <ActionPactLogo />
+        </div>
+          <div className="sr-only">The Action Pact — Newsletter Signup</div>
 
-          <article id="signup" className="mt-10 max-w-2xl">
-            <p className="marker-text text-2xl mb-4">{t.subtitle}</p>
+          <article id="signup" className="mt-1 md:mt-4 max-w-2xl">
+            <p className="marker-text text-xl md:text-3xl mb-0">{t.subtitle}</p>
+            <img 
+              src="/images/swoop.png" 
+              alt="Decorative underline" 
+              className="w-full max-w-xs md:max-w-md h-auto mb-4 md:mb-8 opacity-80 -ml-8 md:-ml-12 -mt-1 md:-mt-1"
+            />
             
-            <form onSubmit={handleSubmit} className="space-y-6" aria-label="Newsletter signup form">
+            <form onSubmit={handleSubmit} className="space-y-2 md:space-y-8" aria-label="Newsletter signup form">
               <div>
-                <label htmlFor="name" className="scribble-label">{t.name}</label>
-                <input id="name" name="name" type="text" className="scribble-input" placeholder={t.namePlaceholder} autoComplete="name" />
-              </div>
-              <div>
-                <label htmlFor="email" className="scribble-label">{t.email}</label>
-                <input id="email" name="email" type="email" required className="scribble-input" placeholder={t.emailPlaceholder} autoComplete="email" />
+                <label htmlFor="name" className="scribble-label text-sm md:text-base">{t.name}</label>
+                <input id="name" name="name" type="text" className="scribble-input py-2 md:py-3 text-sm md:text-base" placeholder={t.namePlaceholder} autoComplete="name" />
               </div>
               <div className="relative">
-                <label htmlFor="city" className="scribble-label">{t.city}</label>
+                <label htmlFor="city" className="scribble-label text-sm md:text-base">{t.city}</label>
                 <input 
                   id="city" 
                   name="city" 
                   type="text" 
-                  className="scribble-input" 
+                  className="scribble-input py-2 md:py-3 text-sm md:text-base" 
                   placeholder={t.cityPlaceholder} 
                   autoComplete="off"
                   value={cityValue}
@@ -325,9 +310,13 @@ const Index = () => {
                   </div>
                 )}
               </div>
+              <div className="mb-2 md:mb-0">
+                <label htmlFor="email" className="scribble-label text-sm md:text-base">{t.email}</label>
+                <input id="email" name="email" type="email" required className="scribble-input py-2 md:py-3 text-sm md:text-base" placeholder={t.emailPlaceholder} autoComplete="email" />
+              </div>
 
-              <div className="pt-4">
-                <button type="submit" className="scribble-button" disabled={loading} aria-busy={loading} aria-live="polite">
+              <div className="pt-6 md:pt-6">
+                <button type="submit" className="scribble-button py-3 md:py-4 text-base md:text-lg" disabled={loading} aria-busy={loading} aria-live="polite">
                   {loading ? t.submitting : t.submit}
                 </button>
               </div>

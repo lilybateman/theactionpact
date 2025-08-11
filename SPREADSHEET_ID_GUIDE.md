@@ -104,3 +104,4 @@ Once you've updated the spreadsheet ID:
 4. **Test the integration** with a form submission
 
 **Your spreadsheet ID is unique to your Google Sheet - make sure you're using the correct one!** 🎯
+

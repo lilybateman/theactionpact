@@ -144,3 +144,5 @@ If you're still stuck, please provide:
 2. The network request details (status code, response)
 3. Your Google Apps Script deployment URL (you can share it - it's public)
 4. Whether you can access the webhook URL directly in a browser
+
+
