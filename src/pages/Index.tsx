@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 
 import { useToast } from "@/hooks/use-toast";
 import ActionPactLogo from "@/components/ActionPactLogo";
+import { supabase } from "@/lib/supabase";
 
   // Cities list for autocomplete - separate arrays for English and French
 const englishCities = [
@@ -179,13 +180,30 @@ const Index = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Google Sheets webhook URL - you'll need to replace this with your actual webhook URL
-  const GOOGLE_SHEETS_WEBHOOK_URL = import.meta.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL || 'https://script.google.com/a/macros/theactionpact.ca/s/AKfycbxfmKPkA6i7zxVzm8JIPgXtKBxNwCxEjFktzraMMtyO0PhIbDorHxXPebSKWH1cNQM9/exec';
+  // Supabase database function
+  const sendToSupabase = async (name: string, email: string, location: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('Newsletter')
+        .insert([
+          {
+            name: name || null,
+            email: email,
+            location: location || null,
+          }
+        ]);
 
-  const sendToGoogleSheets = async (name: string, email: string, city: string) => {
-    // Temporarily disabled - Google Sheets integration commented out
-    console.log('Google Sheets integration temporarily disabled');
-    return true; // Return success so form still works
+      if (error) {
+        console.error('Supabase error:', error);
+        return false;
+      }
+
+      console.log('Data saved to Supabase successfully:', data);
+      return true;
+    } catch (error) {
+      console.error('Error sending to Supabase:', error);
+      return false;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -194,7 +212,7 @@ const Index = () => {
     const data = new FormData(form);
     const name = (data.get("name") as string) || "";
     const email = (data.get("email") as string) || "";
-            const city = cityValue || (data.get("location") as string) || "";
+            const location = cityValue || (data.get("location") as string) || "";
 
     const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     if (!emailValid) {
@@ -205,20 +223,20 @@ const Index = () => {
     setLoading(true);
     
     try {
-      // Send to Google Sheets
-      const sheetsSuccess = await sendToGoogleSheets(name, email, city);
+      // Send to Supabase
+      const dbSuccess = await sendToSupabase(name, email, location);
       
       // Show success message
-      if (sheetsSuccess) {
+      if (dbSuccess) {
         toast({
           title: t.successTitle,
-          description: t.successDescription(name, city),
+          description: t.successDescription(name, location),
         });
       } else {
         // Still show success but mention the data wasn't saved
         toast({
           title: t.successTitle,
-          description: `${t.successDescription(name, city)} (Note: Data may not have been saved to our records)`,
+          description: `${t.successDescription(name, location)} (Note: Data may not have been saved to our records)`,
         });
       }
       
@@ -228,7 +246,7 @@ const Index = () => {
       setShowSuggestions(false);
       setSuggestions([]);
       
-      console.log("Newsletter signup:", { name, email, city, sheetsSuccess });
+      console.log("Newsletter signup:", { name, email, location, dbSuccess });
       
     } catch (error) {
       console.error('Form submission error:', error);
