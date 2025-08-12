@@ -264,7 +264,7 @@ const Index = () => {
           <article id="signup" className="mt-1 md:mt-4 max-w-2xl">
             <p className="marker-text text-xl md:text-3xl mb-0">{t.subtitle}</p>
             <img 
-              src="/images/underline.png" 
+              src="/theactionpact/images/underline.png" 
               alt="Decorative underline" 
               className="w-full max-w-xs md:max-w-md h-auto mb-4 md:mb-8 opacity-80 -ml-32 md:-ml-40 -mt-1 md:-mt-1"
             />
