@@ -54,12 +54,12 @@ const translations = {
     subtitle: "Get in on the Action.",
     name: "Name",
     email: "Email",
-    city: "City",
+    location: "Location",
     submit: "Submit",
     submitting: "Submitting...",
     namePlaceholder: "Your name",
     emailPlaceholder: "you@example.com",
-    cityPlaceholder: "Your city",
+    locationPlaceholder: "Your location",
     successTitle: "You're in!",
     successDescription: (name: string, city: string) => 
       `Thanks ${name || "friend"} — we'll keep you posted${city ? ` about ${city}` : ""}.`,
@@ -75,12 +75,12 @@ const translations = {
     subtitle: "Participez à l'action.",
     name: "Nom",
     email: "Courriel",
-    city: "Ville",
+    location: "Emplacement",
     submit: "Soumettre",
     submitting: "Soumission...",
     namePlaceholder: "Votre nom",
     emailPlaceholder: "vous@exemple.com",
-    cityPlaceholder: "Votre ville",
+    locationPlaceholder: "Votre emplacement",
     successTitle: "Vous êtes inscrit !",
     successDescription: (name: string, city: string) => 
       `Merci ${name || "ami"} — nous vous tiendrons au courant${city ? ` à propos de ${city}` : ""}.`,
@@ -194,7 +194,7 @@ const Index = () => {
     const data = new FormData(form);
     const name = (data.get("name") as string) || "";
     const email = (data.get("email") as string) || "";
-    const city = cityValue || (data.get("city") as string) || "";
+            const city = cityValue || (data.get("location") as string) || "";
 
     const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     if (!emailValid) {
@@ -275,13 +275,13 @@ const Index = () => {
                 <input id="name" name="name" type="text" className="scribble-input py-2 md:py-3 text-sm md:text-base" placeholder={t.namePlaceholder} autoComplete="name" />
               </div>
               <div className="relative">
-                <label htmlFor="city" className="scribble-label text-sm md:text-base">{t.city}</label>
+                <label htmlFor="location" className="scribble-label text-sm md:text-base">{t.location}</label>
                 <input 
-                  id="city" 
-                  name="city" 
+                  id="location" 
+                  name="location" 
                   type="text" 
                   className="scribble-input py-2 md:py-3 text-sm md:text-base" 
-                  placeholder={t.cityPlaceholder} 
+                  placeholder={t.locationPlaceholder} 
                   autoComplete="off"
                   value={cityValue}
                   onChange={handleCityChange}
