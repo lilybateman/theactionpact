@@ -266,7 +266,7 @@ const Index = () => {
             <img 
               src="/theactionpact/images/underline.png" 
               alt="Decorative underline" 
-              className="w-full max-w-xs md:max-w-md h-auto mb-4 md:mb-8 opacity-80 -ml-32 md:-ml-40 -mt-1 md:-mt-1"
+              className="w-full max-w-sm md:max-w-lg h-auto mb-4 md:mb-8 opacity-80 -ml-16 md:-ml-24 -mt-1 md:-mt-1"
             />
             
             <form onSubmit={handleSubmit} className="space-y-2 md:space-y-8" aria-label="Newsletter signup form">
