@@ -230,13 +230,12 @@ const Index = () => {
       if (dbSuccess) {
         toast({
           title: t.successTitle,
-          description: t.successDescription(name, location),
         });
       } else {
         // Still show success but mention the data wasn't saved
         toast({
           title: t.successTitle,
-          description: `${t.successDescription(name, location)} (Note: Data may not have been saved to our records)`,
+          description: "Note: Data may not have been saved to our records",
         });
       }
       
