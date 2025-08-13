@@ -63,7 +63,7 @@ const translations = {
     locationPlaceholder: "Your location",
     successTitle: "You're in!",
     successDescription: (name: string, city: string) => 
-      `Thanks ${name || "friend"} — we'll keep you posted${city ? ` about ${city}` : ""}.`,
+      `You're in!`,
     invalidEmail: "Please enter a valid email.",
     fontOptions: "Font Options:",
     artsyText: "Artsy Text - Caveat Handwriting",
@@ -84,7 +84,7 @@ const translations = {
     locationPlaceholder: "Votre emplacement",
     successTitle: "Vous êtes inscrit !",
     successDescription: (name: string, city: string) => 
-      `Merci ${name || "ami"} — nous vous tiendrons au courant${city ? ` à propos de ${city}` : ""}.`,
+      `Vous êtes inscrit !`,
     invalidEmail: "Veuillez entrer un email valide.",
     fontOptions: "Options de Police:",
     artsyText: "Texte Artistique - Caveat Handwriting",
