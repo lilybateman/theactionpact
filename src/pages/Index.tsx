@@ -69,7 +69,10 @@ const translations = {
     artsyText: "Artsy Text - Caveat Handwriting",
     handwrittenText: "Handwritten Text - Architects Daughter",
     markerText: "✓ Marker Text - Permanent Marker (Selected)",
-    originalHand: "Original Hand - Kalam"
+    originalHand: "Original Hand - Kalam",
+    blurbTitle: "What is The Action Pact?",
+    aboutUs: "About Us",
+    contactUs: "Contact Us"
   },
   fr: {
     title: "Le Pacte d'Action",
@@ -90,7 +93,10 @@ const translations = {
     artsyText: "Texte Artistique - Caveat Handwriting",
     handwrittenText: "Texte Manuscrit - Architects Daughter",
     markerText: "✓ Texte Marqueur - Permanent Marker (Sélectionné)",
-    originalHand: "Main Originale - Kalam"
+    originalHand: "Main Originale - Kalam",
+    blurbTitle: "Qu'est-ce que Le Pacte d'Action ?",
+    aboutUs: "À propos de nous",
+    contactUs: "Contactez-nous"
   }
 };
 
@@ -104,6 +110,8 @@ const Index = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const cityInputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
+  const [showBlurb, setShowBlurb] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
 
   const t = translations[language];
 
@@ -261,30 +269,250 @@ const Index = () => {
   return (
     <>
       <header className="container py-4 md:py-6 flex items-center justify-end">
-        <button
-          onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')}
-          className="language-toggle py-2 md:py-3 text-sm md:text-base"
-          aria-label={`Switch to ${language === 'en' ? 'French' : 'English'}`}
-        >
-          <span className={language === 'fr' ? 'text-primary' : 'text-foreground'}>FR</span>
-          <span className="text-foreground">/</span>
-          <span className={language === 'en' ? 'text-primary' : 'text-foreground'}>EN</span>
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setShowAbout(!showAbout)}
+            className={`text-sm md:text-base transition-colors cursor-pointer ${
+              showAbout ? 'text-red-600 underline' : 'hover:text-red-600 hover:underline'
+            }`}
+          >
+            {t.aboutUs}
+          </button>
+          <button
+            onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')}
+            className="text-sm md:text-base hover:text-red-600 hover:underline transition-colors"
+            aria-label={`Switch to ${language === 'en' ? 'French' : 'English'}`}
+          >
+            <span className={language === 'fr' ? 'text-primary' : 'text-foreground'}>FR</span>
+            <span className="text-foreground">/</span>
+            <span className={language === 'en' ? 'text-primary' : 'text-foreground'}>EN</span>
+          </button>
+        </div>
       </header>
       <main>
         <section className="container pb-24 pt-2">
-                  <div className="flex justify-start mb-8 md:mb-12">
-          <ActionPactLogo />
-        </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 mb-8 md:mb-12">
+            {/* Left column - Logo and Form */}
+            <div className="space-y-8">
+              <ActionPactLogo />
+              
+              <div className="sr-only">The Action Pact — Newsletter Signup</div>
+
+              <article id="signup" className="mt-1 md:mt-4 max-w-2xl">
+                <p className="marker-text text-xl md:text-3xl mb-0">{t.subtitle}</p>
+                <img 
+                  src="/images/underline.png" 
+                  alt="Decorative underline" 
+                  className="w-full max-w-sm md:max-w-lg h-auto mb-4 md:mb-8 opacity-80 -ml-16 md:-ml-24 -mt-1 md:-mt-1"
+                />
+                
+                <form onSubmit={handleSubmit} className="space-y-2 md:space-y-8" aria-label="Newsletter signup form">
+                  <div>
+                    <label htmlFor="name" className="scribble-label text-sm md:text-base">{t.name}</label>
+                    <input id="name" name="name" type="text" className="scribble-input py-2 md:py-3 text-sm md:text-base" placeholder={t.namePlaceholder} autoComplete="name" />
+                  </div>
+                  <div className="relative">
+                    <label htmlFor="location" className="scribble-label text-sm md:text-base">{t.location}</label>
+                    <input 
+                      id="location" 
+                      name="location" 
+                      type="text" 
+                      className="scribble-input py-2 md:py-3 text-sm md:text-base" 
+                      placeholder={t.locationPlaceholder} 
+                      autoComplete="off"
+                      value={cityValue}
+                      onChange={handleCityChange}
+                      onKeyDown={handleKeyDown}
+                      ref={cityInputRef}
+                    />
+                    {showSuggestions && suggestions.length > 0 && (
+                      <div 
+                        ref={suggestionsRef}
+                        className="absolute z-50 w-full mt-1 bg-background border-2 border-foreground rounded-md shadow-lg max-h-48 overflow-y-auto autocomplete-dropdown"
+                        style={{ borderWidth: '3px' }}
+                      >
+                        {suggestions.map((city, index) => (
+                          <button
+                            key={city}
+                            type="button"
+                            className={`w-full px-4 py-2 text-left hover:bg-foreground hover:text-background transition-colors ${
+                              index === selectedIndex ? 'bg-foreground text-background' : ''
+                            }`}
+                            style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif' }}
+                            onClick={() => handleSuggestionClick(city)}
+                          >
+                            {city}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="mb-2 md:mb-0">
+                    <label htmlFor="email" className="scribble-label text-sm md:text-base">{t.email}</label>
+                    <input id="email" name="email" type="email" required className="scribble-input py-2 md:py-3 text-sm md:text-base" placeholder={t.emailPlaceholder} autoComplete="email" />
+                  </div>
+
+                  <div className="pt-6 md:pt-6 flex items-start gap-8">
+                    <button type="submit" className="scribble-button py-3 md:py-4 text-base md:text-lg" disabled={loading} aria-busy={loading} aria-live="polite">
+                      {loading ? t.submitting : t.submit}
+                    </button>
+                    <div className="w-full relative -mt-6">
+                      {/* Arrow pointing to submit button */}
+                      <div className="absolute -left-6 top-1/2 transform -translate-y-1/2 w-0 h-0 border-l-6 border-l-black border-t-3 border-t-transparent border-b-3 border-b-transparent"></div>
+                      
+                      <p className="text-black leading-relaxed text-base" style={{ fontFamily: '"Caveat", cursive', maxWidth: 'calc(100% - 7rem)' }}>
+                        We are just getting started and we want you with us from the beginning. By joining our email list, you will be the first to receive The Action Pact newsletter with timely opportunities, events, and resources that make it easy to take action and connect with others.
+                      </p>
+                    </div>
+                  </div>
+                </form>
+
+                {/* Contact information below submit button */}
+                <div className="pt-10 md:pt-12">
+                  <p className="text-red-600 font-medium text-lg md:text-xl">
+                    {t.contactUs} <a href="mailto:communications@theactionpact.ca" className="underline hover:text-red-800 transition-colors">communications@theactionpact.ca</a>
+                  </p>
+                </div>
+              </article>
+            </div>
+            
+                      {/* Right column - Dropdowns */}
+          <div className="hidden lg:block">
+
+            
+            {/* Blurb dropdown */}
+            {showBlurb && (
+              <div className="max-w-lg">
+                <p className="text-black leading-relaxed text-lg mb-4">
+                  We are just getting started and we want you with us from the beginning.
+                </p>
+                <p className="text-black leading-relaxed text-lg">
+                  By joining our email list, you will be the first to receive The Action Pact newsletter with timely opportunities, events, and resources that make it easy to take action and connect with others.
+                </p>
+              </div>
+            )}
+            
+            {/* About dropdown */}
+            {showAbout && (
+              <div className="max-w-lg">
+                <p className="text-lg mb-6">
+                  We are in the early stage of building The Action Pact and invite you to help shape it from the ground up. The Action Pact is a civic engagement initiative that meets people wherever they are in their democratic journey. Whether you are voting for the first time or already organizing in your community, we are developing practical tools and partnerships to help you participate more meaningfully in public life.
+                </p>
+                
+                <p className="text-lg mb-8">
+                  We are creating a one-stop hub for civic engagement in Canada to address barriers like political noise, institutional distrust, social isolation, and fragmented information. Our approach is grounded in three commitments:
+                </p>
+                
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="marker-text text-lg md:text-xl mb-3">Strategic, evidence-supported participation</h3>
+                    <p className="text-base">
+                      We help you act so your voice and your vote can have the greatest impact, coordinating action that is well-timed, informed, and effective.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="marker-text text-lg md:text-xl mb-3">Democratic confidence</h3>
+                    <p className="text-base">
+                      We help rebuild trust in our democratic systems by giving you the knowledge and skills to navigate them with clarity and purpose.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="marker-text text-lg md:text-xl mb-3">Community power</h3>
+                    <p className="text-base">
+                      We cultivate and amplify community by building spaces for connection and collaboration, and by seeking partnerships with grassroots groups, and local advocacy efforts.
+                    </p>
+                  </div>
+                </div>
+                
+                <p className="text-lg mt-6">
+                  By combining strategic action, civic literacy, and strong networks, The Action Pact is building a culture of meaningful and enthusiastic participation in Canada's democracy.
+                </p>
+              </div>
+            )}
+          </div>
+          </div>
+          
+          {/* Mobile: Dismissible text boxes */}
+          <div className="md:hidden space-y-4 mb-8">
+            {/* Blurb text box */}
+            {showBlurb && (
+              <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 relative">
+                <button
+                  onClick={() => setShowBlurb(false)}
+                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl font-bold"
+                  aria-label="Close"
+                >
+                  ×
+                </button>
+                <p className="text-black leading-relaxed text-base mb-3">
+                  We are just getting started and we want you with us from the beginning.
+                </p>
+                <p className="text-black leading-relaxed text-base">
+                  By joining our email list, you will be the first to receive The Action Pact newsletter with timely opportunities, events, and resources that make it easy to take action and connect with others.
+                </p>
+              </div>
+            )}
+            
+            {/* About text box */}
+            {showAbout && (
+              <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 relative">
+                <button
+                  onClick={() => setShowAbout(false)}
+                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl font-bold"
+                  aria-label="Close"
+                >
+                  ×
+                </button>
+                
+                <p className="text-base mb-4">
+                  We are in the early stage of building The Action Pact and invite you to help shape it from the ground up. The Action Pact is a civic engagement initiative that meets people wherever they are in their democratic journey. Whether you are voting for the first time or already organizing in your community, we are developing practical tools and partnerships to help you participate more meaningfully in public life.
+                </p>
+                
+                <p className="text-base mb-4">
+                  We are creating a one-stop hub for civic engagement in Canada to address barriers like political noise, institutional distrust, social isolation, and fragmented information. Our approach is grounded in three commitments:
+                </p>
+                
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="marker-text text-base font-medium mb-2">Strategic, evidence-supported participation</h3>
+                    <p className="text-sm">
+                      We help you act so your voice and your vote can have the greatest impact, coordinating action that is well-timed, informed, and effective.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="marker-text text-base font-medium mb-2">Democratic confidence</h3>
+                    <p className="text-sm">
+                      We help rebuild trust in our democratic systems by giving you the knowledge and skills to navigate them with clarity and purpose.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="marker-text text-base font-medium mb-2">Community power</h3>
+                    <p className="text-sm">
+                      We cultivate and amplify community by building spaces for connection and collaboration, and by seeking partnerships with grassroots groups, and local advocacy efforts.
+                    </p>
+                  </div>
+                </div>
+                
+                <p className="text-base mt-4">
+                  By combining strategic action, civic literacy, and strong networks, The Action Pact is building a culture of meaningful and enthusiastic participation in Canada's democracy.
+                </p>
+              </div>
+            )}
+          </div>
+          
           <div className="sr-only">The Action Pact — Newsletter Signup</div>
 
           <article id="signup" className="mt-1 md:mt-4 max-w-2xl">
             <p className="marker-text text-xl md:text-3xl mb-0">{t.subtitle}</p>
-                          <img 
-                src="/images/underline.png" 
-                alt="Decorative underline" 
-                className="w-full max-w-sm md:max-w-lg h-auto mb-4 md:mb-8 opacity-80 -ml-16 md:-ml-24 -mt-1 md:-mt-1"
-              />
+            <img 
+              src="/images/underline.png" 
+              alt="Decorative underline" 
+              className="w-full max-w-sm md:max-w-lg h-auto mb-4 md:mb-8 opacity-80 -ml-16 md:-ml-24 -mt-1 md:-mt-1"
+            />
             
             <form onSubmit={handleSubmit} className="space-y-2 md:space-y-8" aria-label="Newsletter signup form">
               <div>
@@ -332,12 +560,27 @@ const Index = () => {
                 <input id="email" name="email" type="email" required className="scribble-input py-2 md:py-3 text-sm md:text-base" placeholder={t.emailPlaceholder} autoComplete="email" />
               </div>
 
-              <div className="pt-6 md:pt-6">
-                <button type="submit" className="scribble-button py-3 md:py-4 text-base md:text-lg" disabled={loading} aria-busy={loading} aria-live="polite">
-                  {loading ? t.submitting : t.submit}
-                </button>
-              </div>
+                                <div className="pt-6 md:pt-6 flex items-start gap-8">
+                    <button type="submit" className="scribble-button py-3 md:py-4 text-base md:text-lg" disabled={loading} aria-busy={loading} aria-live="polite">
+                      {loading ? t.submitting : t.submit}
+                    </button>
+                    <div className="w-full relative -mt-6">
+                      {/* Arrow pointing to submit button */}
+                      <div className="absolute -left-6 top-1/2 transform -translate-y-1/2 w-0 h-0 border-l-6 border-l-black border-t-3 border-t-transparent border-b-3 border-b-transparent"></div>
+                      
+                      <p className="text-black leading-relaxed text-base" style={{ fontFamily: '"Caveat", cursive', maxWidth: 'calc(100% - 7rem)' }}>
+                        We are just getting started and we want you with us from the beginning. By joining our email list, you will be the first to receive The Action Pact newsletter with timely opportunities, events, and resources that make it easy to take action and connect with others.
+                      </p>
+                    </div>
+                  </div>
             </form>
+
+            {/* Contact information below submit button */}
+            <div className="pt-10 md:pt-12">
+              <p className="text-red-600 font-medium text-lg md:text-xl">
+                {t.contactUs} <a href="mailto:communications@theactionpact.ca" className="underline hover:text-red-800 transition-colors">communications@theactionpact.ca</a>
+              </p>
+            </div>
           </article>
         </section>
       </main>
