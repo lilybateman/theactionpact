@@ -382,7 +382,7 @@ const Index = () => {
             
             {/* Blurb dropdown */}
             {showBlurb && (
-              <div className="max-w-lg">
+              <div className="max-w-lg ml-auto text-justify">
                 <p className="text-black leading-relaxed text-lg mb-4">
                   We are just getting started and we want you with us from the beginning.
                 </p>
@@ -394,7 +394,7 @@ const Index = () => {
             
             {/* About dropdown */}
             {showAbout && (
-              <div className="max-w-lg">
+              <div className="max-w-lg ml-auto text-justify">
                 <p className="text-lg mb-6">
                   We are in the early stage of building The Action Pact and invite you to help shape it from the ground up. The Action Pact is a civic engagement initiative that meets people wherever they are in their democratic journey. Whether you are voting for the first time or already organizing in your community, we are developing practical tools and partnerships to help you participate more meaningfully in public life.
                 </p>
