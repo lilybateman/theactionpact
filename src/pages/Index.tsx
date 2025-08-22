@@ -110,7 +110,7 @@ const Index = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const cityInputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
-  const [showBlurb, setShowBlurb] = useState(false);
+
   const [showAbout, setShowAbout] = useState(false);
 
   const t = translations[language];
@@ -356,14 +356,7 @@ const Index = () => {
                     <button type="submit" className="scribble-button py-3 md:py-4 text-base md:text-lg" disabled={loading} aria-busy={loading} aria-live="polite">
                       {loading ? t.submitting : t.submit}
                     </button>
-                    <div className="w-full relative -mt-6">
-                      {/* Arrow pointing to submit button */}
-                      <div className="absolute -left-6 top-1/2 transform -translate-y-1/2 w-0 h-0 border-l-6 border-l-black border-t-3 border-t-transparent border-b-3 border-b-transparent"></div>
-                      
-                      <p className="text-black leading-relaxed text-base" style={{ fontFamily: '"Caveat", cursive', maxWidth: 'calc(100% - 7rem)' }}>
-                        We are just getting started and we want you with us from the beginning. By joining our email list, you will be the first to receive The Action Pact newsletter with timely opportunities, events, and resources that make it easy to take action and connect with others.
-                      </p>
-                    </div>
+
                   </div>
                 </form>
 
@@ -380,17 +373,7 @@ const Index = () => {
           <div className="hidden lg:block">
 
             
-            {/* Blurb dropdown */}
-            {showBlurb && (
-              <div className="max-w-lg ml-auto text-justify">
-                <p className="text-black leading-relaxed text-lg mb-4">
-                  We are just getting started and we want you with us from the beginning.
-                </p>
-                <p className="text-black leading-relaxed text-lg">
-                  By joining our email list, you will be the first to receive The Action Pact newsletter with timely opportunities, events, and resources that make it easy to take action and connect with others.
-                </p>
-              </div>
-            )}
+
             
             {/* About dropdown */}
             {showAbout && (
@@ -405,21 +388,21 @@ const Index = () => {
                 
                 <div className="space-y-6">
                   <div>
-                    <h3 className="marker-text text-lg md:text-xl mb-3">Strategic, evidence-supported participation</h3>
+                    <h3 className="text-red-600 text-lg md:text-xl mb-3">Strategic, evidence-supported participation</h3>
                     <p className="text-base">
                       We help you act so your voice and your vote can have the greatest impact, coordinating action that is well-timed, informed, and effective.
                     </p>
                   </div>
                   
                   <div>
-                    <h3 className="marker-text text-lg md:text-xl mb-3">Democratic confidence</h3>
+                    <h3 className="text-red-600 text-lg md:text-xl mb-3">Democratic confidence</h3>
                     <p className="text-base">
                       We help rebuild trust in our democratic systems by giving you the knowledge and skills to navigate them with clarity and purpose.
                     </p>
                   </div>
                   
                   <div>
-                    <h3 className="marker-text text-lg md:text-xl mb-3">Community power</h3>
+                    <h3 className="text-red-600 text-lg md:text-xl mb-3">Community power</h3>
                     <p className="text-base">
                       We cultivate and amplify community by building spaces for connection and collaboration, and by seeking partnerships with grassroots groups, and local advocacy efforts.
                     </p>
@@ -436,35 +419,19 @@ const Index = () => {
           
           {/* Mobile: Dismissible text boxes */}
           <div className="md:hidden space-y-4 mb-8">
-            {/* Blurb text box */}
-            {showBlurb && (
-              <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 relative">
-                <button
-                  onClick={() => setShowBlurb(false)}
-                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl font-bold"
-                  aria-label="Close"
-                >
-                  ×
-                </button>
-                <p className="text-black leading-relaxed text-base mb-3">
-                  We are just getting started and we want you with us from the beginning.
-                </p>
-                <p className="text-black leading-relaxed text-base">
-                  By joining our email list, you will be the first to receive The Action Pact newsletter with timely opportunities, events, and resources that make it easy to take action and connect with others.
-                </p>
-              </div>
-            )}
+
             
             {/* About text box */}
             {showAbout && (
-              <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 relative">
-                <button
-                  onClick={() => setShowAbout(false)}
-                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl font-bold"
-                  aria-label="Close"
-                >
-                  ×
-                </button>
+              <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                <div className="bg-white border-2 border-gray-300 rounded-lg p-6 relative shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
+                  <button
+                    onClick={() => setShowAbout(false)}
+                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold"
+                    aria-label="Close"
+                  >
+                    ×
+                  </button>
                 
                 <p className="text-base mb-4">
                   We are in the early stage of building The Action Pact and invite you to help shape it from the ground up. The Action Pact is a civic engagement initiative that meets people wherever they are in their democratic journey. Whether you are voting for the first time or already organizing in your community, we are developing practical tools and partnerships to help you participate more meaningfully in public life.
@@ -476,21 +443,21 @@ const Index = () => {
                 
                 <div className="space-y-4">
                   <div>
-                    <h3 className="marker-text text-base font-medium mb-2">Strategic, evidence-supported participation</h3>
+                    <h3 className="text-red-600 text-base font-medium mb-2">Strategic, evidence-supported participation</h3>
                     <p className="text-sm">
                       We help you act so your voice and your vote can have the greatest impact, coordinating action that is well-timed, informed, and effective.
                     </p>
                   </div>
                   
                   <div>
-                    <h3 className="marker-text text-base font-medium mb-2">Democratic confidence</h3>
+                    <h3 className="text-red-600 text-base font-medium mb-2">Democratic confidence</h3>
                     <p className="text-sm">
                       We help rebuild trust in our democratic systems by giving you the knowledge and skills to navigate them with clarity and purpose.
                     </p>
                   </div>
                   
                   <div>
-                    <h3 className="marker-text text-base font-medium mb-2">Community power</h3>
+                    <h3 className="text-red-600 text-base font-medium mb-2">Community power</h3>
                     <p className="text-sm">
                       We cultivate and amplify community by building spaces for connection and collaboration, and by seeking partnerships with grassroots groups, and local advocacy efforts.
                     </p>
@@ -500,6 +467,7 @@ const Index = () => {
                 <p className="text-base mt-4">
                   By combining strategic action, civic literacy, and strong networks, The Action Pact is building a culture of meaningful and enthusiastic participation in Canada's democracy.
                 </p>
+                </div>
               </div>
             )}
           </div>
