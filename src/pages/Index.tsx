@@ -72,7 +72,16 @@ const translations = {
     originalHand: "Original Hand - Kalam",
     blurbTitle: "What is The Action Pact?",
     aboutUs: "About Us",
-    contactUs: "Contact Us"
+    contactUs: "Contact us:",
+    aboutContent1: "We are in the early stage of building The Action Pact and invite you to help shape it from the ground up. The Action Pact is a civic engagement initiative that meets people wherever they are in their democratic journey. Whether you are voting for the first time or already organizing in your community, we are developing practical tools and partnerships to help you participate more meaningfully in public life.",
+    aboutContent2: "We are creating a one-stop hub for civic engagement in Canada to address barriers like political noise, institutional distrust, social isolation, and fragmented information. Our approach is grounded in three commitments:",
+    strategicTitle: "Strategic, evidence-supported participation",
+    strategicContent: "We help you act so your voice and your vote can have the greatest impact, coordinating action that is informed and effective.",
+    democraticTitle: "Democratic confidence",
+    democraticContent: "We help rebuild trust in our democratic systems by giving you the knowledge and skills to navigate them with clarity and purpose.",
+    communityTitle: "Community power",
+    communityContent: "We cultivate and amplify community by building spaces for connection and collaboration, and by seeking partnerships with grassroots groups and local advocacy efforts.",
+    aboutContent3: "By combining strategic action, civic literacy, and strong networks, The Action Pact is building a culture of meaningful and enthusiastic participation in Canada's democracy."
   },
   fr: {
     title: "Le Pacte d'Action",
@@ -95,8 +104,17 @@ const translations = {
     markerText: "✓ Texte Marqueur - Permanent Marker (Sélectionné)",
     originalHand: "Main Originale - Kalam",
     blurbTitle: "Qu'est-ce que Le Pacte d'Action ?",
-    aboutUs: "À propos de nous",
-    contactUs: "Contactez-nous"
+    aboutUs: "À Propos de Nous",
+    contactUs: "Contactez-nous:",
+    aboutContent1: "Nous en sommes aux premières étapes de la création de The Action Pact et nous vous invitons à contribuer à le façonner dès le départ. The Action Pact est une initiative d'engagement civique qui se connecte aux gens où qu'ils soient dans leur parcours démocratique. Que vous votiez pour la première fois ou que vous organisez déjà des actions dans votre communauté, nous développons des outils pratiques et des partenariats pour vous aider à donner plus d'impact à votre participation à la vie publique.",
+    aboutContent2: "Nous créons une plateforme centralisée pour l'engagement civique au Canada afin de lever des obstacles comme le brouhaha politique, la méfiance envers les institutions, l'isolement social et l'éclatement de l'information. Notre approche repose sur trois engagements :",
+    strategicTitle: "Participation stratégique et fondée sur des faits",
+    strategicContent: "Nous vous aidons à agir pour que votre voix et votre vote aient le plus grand impact possible, en coordonnant des actions éclairées et efficaces.",
+    democraticTitle: "Confiance démocratique",
+    democraticContent: "Nous contribuons à rétablir la confiance dans nos systèmes démocratiques en vous donnant les connaissances et les compétences nécessaires pour les naviguer avec clarté et détermination.",
+    communityTitle: "Pouvoir communautaire",
+    communityContent: "Nous cultivons et amplifions le pouvoir des communautés en créant des espaces de connexion et de collaboration, et en recherchant des partenariats avec des groupes locaux et des initiatives de base.",
+    aboutContent3: "En combinant action stratégique, compréhension de la vie civique et réseaux solides, The Action Pact bâtit une culture de participation impactante et enthousiaste à la démocratie canadienne."
   }
 };
 
@@ -378,39 +396,40 @@ const Index = () => {
             {/* About dropdown */}
             {showAbout && (
               <div className="max-w-lg ml-auto text-justify">
+                <h2 className="text-red-600 text-xl md:text-2xl font-bold mb-6">{t.aboutUs}</h2>
                 <p className="text-lg mb-6">
-                  We are in the early stage of building The Action Pact and invite you to help shape it from the ground up. The Action Pact is a civic engagement initiative that meets people wherever they are in their democratic journey. Whether you are voting for the first time or already organizing in your community, we are developing practical tools and partnerships to help you participate more meaningfully in public life.
+                  {t.aboutContent1}
                 </p>
                 
                 <p className="text-lg mb-8">
-                  We are creating a one-stop hub for civic engagement in Canada to address barriers like political noise, institutional distrust, social isolation, and fragmented information. Our approach is grounded in three commitments:
+                  {t.aboutContent2}
                 </p>
                 
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-red-600 text-lg md:text-xl mb-3">Strategic, evidence-supported participation</h3>
+                    <h3 className="text-red-600 text-lg md:text-xl mb-3">{t.strategicTitle}</h3>
                     <p className="text-base">
-                      We help you act so your voice and your vote can have the greatest impact, coordinating action that is well-timed, informed, and effective.
+                      {t.strategicContent}
                     </p>
                   </div>
                   
                   <div>
-                    <h3 className="text-red-600 text-lg md:text-xl mb-3">Democratic confidence</h3>
+                    <h3 className="text-red-600 text-lg md:text-xl mb-3">{t.democraticTitle}</h3>
                     <p className="text-base">
-                      We help rebuild trust in our democratic systems by giving you the knowledge and skills to navigate them with clarity and purpose.
+                      {t.democraticContent}
                     </p>
                   </div>
                   
                   <div>
-                    <h3 className="text-red-600 text-lg md:text-xl mb-3">Community power</h3>
+                    <h3 className="text-red-600 text-lg md:text-xl mb-3">{t.communityTitle}</h3>
                     <p className="text-base">
-                      We cultivate and amplify community by building spaces for connection and collaboration, and by seeking partnerships with grassroots groups, and local advocacy efforts.
+                      {t.communityContent}
                     </p>
                   </div>
                 </div>
                 
                 <p className="text-lg mt-6">
-                  By combining strategic action, civic literacy, and strong networks, The Action Pact is building a culture of meaningful and enthusiastic participation in Canada's democracy.
+                  {t.aboutContent3}
                 </p>
               </div>
             )}
@@ -433,39 +452,40 @@ const Index = () => {
                     ×
                   </button>
                 
+                <h2 className="text-red-600 text-lg font-bold mb-4">{t.aboutUs}</h2>
                 <p className="text-base mb-4">
-                  We are in the early stage of building The Action Pact and invite you to help shape it from the ground up. The Action Pact is a civic engagement initiative that meets people wherever they are in their democratic journey. Whether you are voting for the first time or already organizing in your community, we are developing practical tools and partnerships to help you participate more meaningfully in public life.
+                  {t.aboutContent1}
                 </p>
                 
                 <p className="text-base mb-4">
-                  We are creating a one-stop hub for civic engagement in Canada to address barriers like political noise, institutional distrust, social isolation, and fragmented information. Our approach is grounded in three commitments:
+                  {t.aboutContent2}
                 </p>
                 
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-red-600 text-base font-medium mb-2">Strategic, evidence-supported participation</h3>
+                    <h3 className="text-red-600 text-base font-medium mb-2">{t.strategicTitle}</h3>
                     <p className="text-sm">
-                      We help you act so your voice and your vote can have the greatest impact, coordinating action that is well-timed, informed, and effective.
+                      {t.strategicContent}
                     </p>
                   </div>
                   
                   <div>
-                    <h3 className="text-red-600 text-base font-medium mb-2">Democratic confidence</h3>
+                    <h3 className="text-red-600 text-base font-medium mb-2">{t.democraticTitle}</h3>
                     <p className="text-sm">
-                      We help rebuild trust in our democratic systems by giving you the knowledge and skills to navigate them with clarity and purpose.
+                      {t.democraticContent}
                     </p>
                   </div>
                   
                   <div>
-                    <h3 className="text-red-600 text-base font-medium mb-2">Community power</h3>
+                    <h3 className="text-red-600 text-base font-medium mb-2">{t.communityTitle}</h3>
                     <p className="text-sm">
-                      We cultivate and amplify community by building spaces for connection and collaboration, and by seeking partnerships with grassroots groups, and local advocacy efforts.
+                      {t.communityContent}
                     </p>
                   </div>
                 </div>
                 
                 <p className="text-base mt-4">
-                  By combining strategic action, civic literacy, and strong networks, The Action Pact is building a culture of meaningful and enthusiastic participation in Canada's democracy.
+                  {t.aboutContent3}
                 </p>
                 </div>
               </div>
