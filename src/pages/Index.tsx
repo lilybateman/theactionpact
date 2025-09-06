@@ -72,7 +72,11 @@ const translations = {
     originalHand: "Original Hand - Kalam",
     blurbTitle: "What is The Action Pact?",
     aboutUs: "About Us",
-    contactUs: "Contact us:",
+    whySubscribe: "Why Subscribe?",
+    whySubscribeContent1: "We are just getting started and we want you with us from the beginning. The Action Pact is here to make civic engagement in Canada strategic, accessible, and collective.",
+    whySubscribeContent2: "By joining our email list, you will be the first to receive The Action Pact newsletter with timely opportunities, events, and resources that make it easy to take action and connect with others.",
+    whySubscribeContent3: "Together, we're building a culture of meaningful and enthusiastic participation in Canada's democracy.",
+    contactUs: "Contact Us:",
     aboutContent1: "We are in the early stage of building The Action Pact and invite you to help shape it from the ground up. The Action Pact is a civic engagement initiative that meets people wherever they are in their democratic journey. Whether you are voting for the first time or already organizing in your community, we are developing practical tools and partnerships to help you participate more meaningfully in public life.",
     aboutContent2: "We are creating a one-stop hub for civic engagement in Canada to address barriers like political noise, institutional distrust, social isolation, and fragmented information. Our approach is grounded in three commitments:",
     strategicTitle: "Strategic, evidence-supported participation",
@@ -105,7 +109,11 @@ const translations = {
     originalHand: "Main Originale - Kalam",
     blurbTitle: "Qu'est-ce que Le Pacte d'Action ?",
     aboutUs: "À Propos de Nous",
-    contactUs: "Contactez-nous:",
+    whySubscribe: "Pourquoi S'abonner ?",
+    whySubscribeContent1: "Nous n'en sommes qu'au début et nous voulons que vous fassiez partie de l'aventure dès le départ. The Action Pact est là pour rendre l'engagement civique au Canada stratégique, accessible et collectif.",
+    whySubscribeContent2: "En vous inscrivant à notre liste de diffusion, vous serez les premiers à recevoir l'infolettre de The Action Pact, avec des événements et des ressources qui facilitent le passage à l'action et la connexion avec les autres.",
+    whySubscribeContent3: "Ensemble, nous bâtissons une culture de participation impactante et enthousiaste à la démocratie canadienne.",
+    contactUs: "Contactez-Nous:",
     aboutContent1: "Nous en sommes aux premières étapes de la création de The Action Pact et nous vous invitons à contribuer à le façonner dès le départ. The Action Pact est une initiative d'engagement civique qui se connecte aux gens où qu'ils soient dans leur parcours démocratique. Que vous votiez pour la première fois ou que vous organisez déjà des actions dans votre communauté, nous développons des outils pratiques et des partenariats pour vous aider à donner plus d'impact à votre participation à la vie publique.",
     aboutContent2: "Nous créons une plateforme centralisée pour l'engagement civique au Canada afin de lever des obstacles comme le brouhaha politique, la méfiance envers les institutions, l'isolement social et l'éclatement de l'information. Notre approche repose sur trois engagements :",
     strategicTitle: "Participation stratégique et fondée sur des faits",
@@ -130,6 +138,7 @@ const Index = () => {
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
   const [showAbout, setShowAbout] = useState(false);
+  const [showWhySubscribe, setShowWhySubscribe] = useState(false);
 
   const t = translations[language];
 
@@ -144,7 +153,19 @@ const Index = () => {
       city.toLowerCase().includes(input.toLowerCase())
     );
     
-    return filtered.slice(0, 8); // Limit to 8 suggestions
+    // Add the user's input as the first option if it's not already in the list
+    const userInput = input.trim();
+    const suggestions = [];
+    
+    // Add user input as first option if it's not already in the filtered results
+    if (!filtered.some(city => city.toLowerCase() === userInput.toLowerCase())) {
+      suggestions.push(userInput);
+    }
+    
+    // Add filtered cities (limit to 7 more to keep total at 8)
+    suggestions.push(...filtered.slice(0, 7));
+    
+    return suggestions;
   };
 
   // Handle city input change
@@ -289,16 +310,30 @@ const Index = () => {
       <header className="container py-4 md:py-6 flex items-center justify-end">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => setShowAbout(!showAbout)}
+            onClick={() => {
+              setShowAbout(!showAbout);
+              if (!showAbout) setShowWhySubscribe(false);
+            }}
             className={`text-sm md:text-base transition-colors cursor-pointer ${
-              showAbout ? 'text-red-600 underline' : 'hover:text-red-600 hover:underline'
+              showAbout ? 'text-primary underline' : 'hover:text-primary hover:underline'
             }`}
           >
             {t.aboutUs}
           </button>
           <button
+            onClick={() => {
+              setShowWhySubscribe(!showWhySubscribe);
+              if (!showWhySubscribe) setShowAbout(false);
+            }}
+            className={`text-sm md:text-base transition-colors cursor-pointer ${
+              showWhySubscribe ? 'text-primary underline' : 'hover:text-primary hover:underline'
+            }`}
+          >
+            {t.whySubscribe}
+          </button>
+          <button
             onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')}
-            className="text-sm md:text-base hover:text-red-600 hover:underline transition-colors"
+            className="text-sm md:text-base hover:text-primary hover:underline transition-colors"
             aria-label={`Switch to ${language === 'en' ? 'French' : 'English'}`}
           >
             <span className={language === 'fr' ? 'text-primary' : 'text-foreground'}>FR</span>
@@ -307,9 +342,9 @@ const Index = () => {
           </button>
         </div>
       </header>
-      <main>
-        <section className="container pb-24 pt-2">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 mb-8 md:mb-12">
+      <main className="min-h-screen flex flex-col">
+        <section className="container flex-1 flex flex-col justify-start pt-0 pb-4 md:pb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
             {/* Left column - Logo and Form */}
             <div className="space-y-8">
               <ActionPactLogo />
@@ -349,19 +384,24 @@ const Index = () => {
                         className="absolute z-50 w-full mt-1 bg-background border-2 border-foreground rounded-md shadow-lg max-h-48 overflow-y-auto autocomplete-dropdown"
                         style={{ borderWidth: '3px' }}
                       >
-                        {suggestions.map((city, index) => (
-                          <button
-                            key={city}
-                            type="button"
-                            className={`w-full px-4 py-2 text-left hover:bg-foreground hover:text-background transition-colors ${
-                              index === selectedIndex ? 'bg-foreground text-background' : ''
-                            }`}
-                            style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif' }}
-                            onClick={() => handleSuggestionClick(city)}
-                          >
-                            {city}
-                          </button>
-                        ))}
+                        {suggestions.map((city, index) => {
+                          // Check if this is the user's input (first option and not in the predefined list)
+                          const isUserInput = index === 0 && !englishCities.includes(city) && !frenchCities.includes(city);
+                          
+                          return (
+                            <button
+                              key={city}
+                              type="button"
+                              className={`w-full px-4 py-2 text-left hover:bg-foreground hover:text-background transition-colors ${
+                                index === selectedIndex ? 'bg-foreground text-background' : ''
+                              } ${isUserInput ? 'font-medium' : ''}`}
+                              style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif' }}
+                              onClick={() => handleSuggestionClick(city)}
+                            >
+                              {city}
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -379,9 +419,9 @@ const Index = () => {
                 </form>
 
                 {/* Contact information below submit button */}
-                <div className="pt-10 md:pt-12">
-                  <p className="text-red-600 font-medium text-base md:text-lg">
-                    {t.contactUs} <a href="mailto:communications@theactionpact.ca" className="underline hover:text-red-800 transition-colors">communications@theactionpact.ca</a>
+                <div className="pt-8 md:pt-12">
+                  <p className="text-primary font-medium text-base md:text-lg">
+                    {t.contactUs} <a href="mailto:communications@theactionpact.ca" className="underline hover:text-primary/80 transition-colors">communications@theactionpact.ca</a>
                   </p>
                 </div>
               </article>
@@ -393,10 +433,26 @@ const Index = () => {
             
 
             
+            {/* Why subscribe dropdown */}
+            {showWhySubscribe && (
+              <div className="max-w-2xl ml-auto text-justify">
+                <h2 className="text-primary text-xl md:text-2xl font-bold mb-6">{t.whySubscribe}</h2>
+                <p className="text-lg mb-6">
+                  {t.whySubscribeContent1}
+                </p>
+                <p className="text-lg mb-6">
+                  {t.whySubscribeContent2}
+                </p>
+                <p className="text-lg">
+                  {t.whySubscribeContent3}
+                </p>
+              </div>
+            )}
+            
             {/* About dropdown */}
             {showAbout && (
               <div className="max-w-2xl ml-auto text-justify">
-                <h2 className="text-red-600 text-xl md:text-2xl font-bold mb-6">{t.aboutUs}</h2>
+                <h2 className="text-primary text-xl md:text-2xl font-bold mb-6">{t.aboutUs}</h2>
                 <p className="text-lg mb-6">
                   {t.aboutContent1}
                 </p>
@@ -407,21 +463,21 @@ const Index = () => {
                 
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-red-600 text-lg md:text-xl mb-3">{t.strategicTitle}</h3>
+                    <h3 className="text-primary text-lg md:text-xl mb-3">{t.strategicTitle}</h3>
                     <p className="text-base">
                       {t.strategicContent}
                     </p>
                   </div>
                   
                   <div>
-                    <h3 className="text-red-600 text-lg md:text-xl mb-3">{t.democraticTitle}</h3>
+                    <h3 className="text-primary text-lg md:text-xl mb-3">{t.democraticTitle}</h3>
                     <p className="text-base">
                       {t.democraticContent}
                     </p>
                   </div>
                   
                   <div>
-                    <h3 className="text-red-600 text-lg md:text-xl mb-3">{t.communityTitle}</h3>
+                    <h3 className="text-primary text-lg md:text-xl mb-3">{t.communityTitle}</h3>
                     <p className="text-base">
                       {t.communityContent}
                     </p>
@@ -437,22 +493,48 @@ const Index = () => {
           </div>
           
           {/* Mobile: Dismissible text boxes */}
-          <div className="md:hidden space-y-4 mb-8">
+          <div className="md:hidden space-y-4">
 
             
-            {/* About text box */}
-            {showAbout && (
+            {/* Why subscribe text box */}
+            {showWhySubscribe && (
               <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-                <div className="bg-white border-2 border-gray-300 rounded-lg p-6 relative shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
+                <div className="bg-background border-2 border-border rounded-lg p-6 relative shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
                   <button
-                    onClick={() => setShowAbout(false)}
-                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold"
+                    onClick={() => setShowWhySubscribe(false)}
+                    className="absolute top-3 right-3 text-muted-foreground hover:text-foreground text-xl font-bold"
                     aria-label="Close"
                   >
                     ×
                   </button>
                 
-                <h2 className="text-red-600 text-lg font-bold mb-4">{t.aboutUs}</h2>
+                <h2 className="text-primary text-lg font-bold mb-4">{t.whySubscribe}</h2>
+                <p className="text-base mb-4">
+                  {t.whySubscribeContent1}
+                </p>
+                <p className="text-base mb-4">
+                  {t.whySubscribeContent2}
+                </p>
+                <p className="text-base">
+                  {t.whySubscribeContent3}
+                </p>
+                </div>
+              </div>
+            )}
+            
+            {/* About text box */}
+            {showAbout && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                <div className="bg-background border-2 border-border rounded-lg p-6 relative shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
+                  <button
+                    onClick={() => setShowAbout(false)}
+                    className="absolute top-3 right-3 text-muted-foreground hover:text-foreground text-xl font-bold"
+                    aria-label="Close"
+                  >
+                    ×
+                  </button>
+                
+                <h2 className="text-primary text-lg font-bold mb-4">{t.aboutUs}</h2>
                 <p className="text-base mb-4">
                   {t.aboutContent1}
                 </p>
@@ -463,21 +545,21 @@ const Index = () => {
                 
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-red-600 text-base font-medium mb-2">{t.strategicTitle}</h3>
+                    <h3 className="text-primary text-base font-medium mb-2">{t.strategicTitle}</h3>
                     <p className="text-sm">
                       {t.strategicContent}
                     </p>
                   </div>
                   
                   <div>
-                    <h3 className="text-red-600 text-base font-medium mb-2">{t.democraticTitle}</h3>
+                    <h3 className="text-primary text-base font-medium mb-2">{t.democraticTitle}</h3>
                     <p className="text-sm">
                       {t.democraticContent}
                     </p>
                   </div>
                   
                   <div>
-                    <h3 className="text-red-600 text-base font-medium mb-2">{t.communityTitle}</h3>
+                    <h3 className="text-primary text-base font-medium mb-2">{t.communityTitle}</h3>
                     <p className="text-sm">
                       {t.communityContent}
                     </p>
