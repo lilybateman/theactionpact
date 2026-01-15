@@ -492,7 +492,7 @@ const Index = () => {
             
             {/* Why subscribe dropdown */}
             {showWhySubscribe && (
-              <div className="max-w-2xl ml-auto text-justify">
+              <div className="max-w-lg">
                 <h2 className="text-primary text-xl md:text-2xl font-bold mb-6">{t.whySubscribe}</h2>
                 <p className="text-lg mb-6 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
                   {t.whySubscribeContent1}
@@ -508,7 +508,7 @@ const Index = () => {
             
             {/* About dropdown */}
             {showAbout && (
-              <div className="max-w-2xl ml-auto text-justify">
+              <div className="max-w-lg">
                 <h2 className="text-primary text-xl md:text-2xl font-bold mb-6">{t.aboutUs}</h2>
                 <p className="text-lg mb-6 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
                   {t.aboutContent1}
