@@ -137,14 +137,14 @@ const Index = () => {
 
   const t = translations[language];
 
-  // Helper function to highlight specific words in red
+  // Helper function to highlight specific words in red and bold
   const highlightWords = (text: string) => {
     if (language === 'en') {
       // Highlight "strategic, accessible, and collective"
       const parts = text.split(/(strategic, accessible, and collective)/);
       return parts.map((part, i) => 
         part === 'strategic, accessible, and collective' 
-          ? <span key={i} className="text-primary">{part}</span>
+          ? <span key={i} className="text-primary font-bold">{part}</span>
           : part
       );
     } else {
@@ -152,7 +152,7 @@ const Index = () => {
       const parts = text.split(/(stratégique, accessible et collective)/);
       return parts.map((part, i) => 
         part === 'stratégique, accessible et collective' 
-          ? <span key={i} className="text-primary">{part}</span>
+          ? <span key={i} className="text-primary font-bold">{part}</span>
           : part
       );
     }
@@ -336,7 +336,7 @@ const Index = () => {
               setShowAbout(!showAbout);
               if (!showAbout) setShowWhySubscribe(false);
             }}
-            className={`text-sm md:text-base transition-colors cursor-pointer ${
+            className={`text-sm md:text-base font-bold transition-colors cursor-pointer ${
               showAbout ? 'text-primary underline' : 'hover:text-primary hover:underline'
             }`}
           >
@@ -347,7 +347,7 @@ const Index = () => {
               setShowWhySubscribe(!showWhySubscribe);
               if (!showWhySubscribe) setShowAbout(false);
             }}
-            className={`text-sm md:text-base transition-colors cursor-pointer ${
+            className={`text-sm md:text-base font-bold transition-colors cursor-pointer ${
               showWhySubscribe ? 'text-primary underline' : 'hover:text-primary hover:underline'
             }`}
           >
@@ -359,7 +359,7 @@ const Index = () => {
               setLanguage(newLang);
               setPreferredLanguage(newLang);
             }}
-            className="text-sm md:text-base hover:text-primary hover:underline transition-colors"
+            className="text-sm md:text-base font-bold hover:text-primary hover:underline transition-colors"
             aria-label={`Switch to ${language === 'en' ? 'French' : 'English'}`}
           >
             <span className={language === 'fr' ? 'text-primary' : 'text-foreground'}>FR</span>
@@ -382,16 +382,16 @@ const Index = () => {
                 
                 <form onSubmit={handleSubmit} className="space-y-2 md:space-y-8" aria-label="Newsletter signup form">
                   <div>
-                    <label htmlFor="name" className="scribble-label text-sm md:text-base">{t.name}</label>
-                    <input id="name" name="name" type="text" className="scribble-input py-2 md:py-3 text-sm md:text-base" placeholder={t.namePlaceholder} autoComplete="name" />
+                    <label htmlFor="name" className="scribble-label text-lg md:text-xl">{t.name}</label>
+                    <input id="name" name="name" type="text" className="scribble-input py-2 md:py-3 text-lg md:text-xl" placeholder={t.namePlaceholder} autoComplete="name" />
                   </div>
                   <div className="relative">
-                    <label htmlFor="location" className="scribble-label text-sm md:text-base">{t.location}</label>
+                    <label htmlFor="location" className="scribble-label text-lg md:text-xl">{t.location}</label>
                     <input 
                       id="location" 
                       name="location" 
                       type="text" 
-                      className="scribble-input py-2 md:py-3 text-sm md:text-base" 
+                      className="scribble-input py-2 md:py-3 text-lg md:text-xl" 
                       placeholder={t.locationPlaceholder} 
                       autoComplete="off"
                       value={cityValue}
@@ -427,12 +427,12 @@ const Index = () => {
                     )}
                   </div>
                   <div className="mb-2 md:mb-0">
-                    <label htmlFor="email" className="scribble-label text-sm md:text-base">{t.email}</label>
-                    <input id="email" name="email" type="email" required className="scribble-input py-2 md:py-3 text-sm md:text-base" placeholder={t.emailPlaceholder} autoComplete="email" />
+                    <label htmlFor="email" className="scribble-label text-lg md:text-xl">{t.email}</label>
+                    <input id="email" name="email" type="email" required className="scribble-input py-2 md:py-3 text-lg md:text-xl" placeholder={t.emailPlaceholder} autoComplete="email" />
                   </div>
 
                   <div className="pt-4 md:pt-6">
-                    <label className="scribble-label text-sm md:text-base">Language Preference</label>
+                    <label className="scribble-label text-lg md:text-xl">Language Preference</label>
                     <div className="flex items-center gap-2 mt-2 ml-1">
                       <button
                         type="button"
@@ -440,7 +440,7 @@ const Index = () => {
                           setLanguage('en');
                           setPreferredLanguage('en');
                         }}
-                        className={`px-2 py-1 text-xs md:text-sm border rounded transition-colors ${
+                        className={`px-2 py-1 text-sm md:text-base border rounded transition-colors ${
                           preferredLanguage === 'en' 
                             ? 'bg-primary text-white border-primary' 
                             : 'bg-transparent border-primary text-primary hover:bg-primary/10'
@@ -455,7 +455,7 @@ const Index = () => {
                           setLanguage('fr');
                           setPreferredLanguage('fr');
                         }}
-                        className={`px-2 py-1 text-xs md:text-sm border rounded transition-colors ${
+                        className={`px-2 py-1 text-sm md:text-base border rounded transition-colors ${
                           preferredLanguage === 'fr' 
                             ? 'bg-primary text-white border-primary' 
                             : 'bg-transparent border-primary text-primary hover:bg-primary/10'
@@ -468,7 +468,7 @@ const Index = () => {
                   </div>
 
                   <div className="pt-6 md:pt-6 flex items-start gap-8">
-                    <button type="submit" className="scribble-button py-3 md:py-4 text-base md:text-lg" disabled={loading} aria-busy={loading} aria-live="polite">
+                    <button type="submit" className="scribble-button py-3 md:py-4 !text-lg md:!text-xl" style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif', fontWeight: 500 }} disabled={loading} aria-busy={loading} aria-live="polite">
                       {loading ? t.submitting : t.submit}
                     </button>
 
@@ -494,13 +494,13 @@ const Index = () => {
             {showWhySubscribe && (
               <div className="max-w-lg">
                 <h2 className="text-primary text-xl md:text-2xl font-bold mb-6">{t.whySubscribe}</h2>
-                <p className="text-lg mb-6 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
+                <p className="text-xl mb-6 font-normal" style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif', fontWeight: 500 }}>
                   {t.whySubscribeContent1}
                 </p>
-                <p className="text-lg mb-6 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
+                <p className="text-xl mb-6 font-normal" style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif', fontWeight: 500 }}>
                   {t.whySubscribeContent2}
                 </p>
-                <p className="text-lg font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
+                <p className="text-xl font-normal" style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif', fontWeight: 500 }}>
                   {t.whySubscribeContent3}
                 </p>
               </div>
@@ -510,15 +510,15 @@ const Index = () => {
             {showAbout && (
               <div className="max-w-lg">
                 <h2 className="text-primary text-xl md:text-2xl font-bold mb-6">{t.aboutUs}</h2>
-                <p className="text-lg mb-6 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
+                <p className="text-xl mb-6 font-normal" style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif', fontWeight: 500 }}>
                   {t.aboutContent1}
                 </p>
                 
-                <p className="text-lg mb-6 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
+                <p className="text-xl mb-6 font-normal" style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif', fontWeight: 500 }}>
                   {t.aboutContent2}
                 </p>
                 
-                <p className="text-lg font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
+                <p className="text-xl font-normal" style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif', fontWeight: 500 }}>
                   {highlightWords(t.aboutContent3)}
                 </p>
               </div>
@@ -543,13 +543,13 @@ const Index = () => {
                   </button>
                 
                 <h2 className="text-primary text-lg font-bold mb-4">{t.whySubscribe}</h2>
-                <p className="text-base mb-4 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
+                <p className="text-lg mb-4 font-normal" style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif', fontWeight: 500 }}>
                   {t.whySubscribeContent1}
                 </p>
-                <p className="text-base mb-4 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
+                <p className="text-lg mb-4 font-normal" style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif', fontWeight: 500 }}>
                   {t.whySubscribeContent2}
                 </p>
-                <p className="text-base font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
+                <p className="text-lg font-normal" style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif', fontWeight: 500 }}>
                   {t.whySubscribeContent3}
                 </p>
                 </div>
@@ -569,15 +569,15 @@ const Index = () => {
                   </button>
                 
                 <h2 className="text-primary text-lg font-bold mb-4">{t.aboutUs}</h2>
-                <p className="text-base mb-4 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
+                <p className="text-lg mb-4 font-normal" style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif', fontWeight: 500 }}>
                   {t.aboutContent1}
                 </p>
                 
-                <p className="text-base mb-4 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
+                <p className="text-lg mb-4 font-normal" style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif', fontWeight: 500 }}>
                   {t.aboutContent2}
                 </p>
                 
-                <p className="text-base font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
+                <p className="text-lg font-normal" style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif', fontWeight: 500 }}>
                   {highlightWords(t.aboutContent3)}
                 </p>
                 </div>

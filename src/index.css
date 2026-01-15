@@ -156,6 +156,7 @@
   .scribble-label {
     @apply text-lg leading-tight mb-2;
     font-family: "Fraunces", ui-serif, Georgia, serif;
+    font-weight: 500;
   }
 
   /* Required symbol: show an asterisk for labels preceding required fields */
