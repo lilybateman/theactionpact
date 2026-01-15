@@ -65,6 +65,9 @@ const translations = {
     successDescription: (name: string, city: string) => 
       `You're in!`,
     invalidEmail: "Please enter a valid email.",
+    preferredLanguage: "Preferred Language:",
+    english: "English",
+    french: "French",
     fontOptions: "Font Options:",
     artsyText: "Artsy Text - Caveat Handwriting",
     handwrittenText: "Handwritten Text - Architects Daughter",
@@ -77,15 +80,9 @@ const translations = {
     whySubscribeContent2: "By joining our email list, you will be the first to receive The Action Pact newsletter with timely opportunities, events, and resources that make it easy to take action and connect with others.",
     whySubscribeContent3: "Together, we're building a culture of meaningful and enthusiastic participation in Canada's democracy.",
     contactUs: "Contact Us:",
-    aboutContent1: "We are in the early stage of building The Action Pact and invite you to help shape it from the ground up. The Action Pact is a civic engagement initiative that meets people wherever they are in their democratic journey. Whether you are voting for the first time or already organizing in your community, we are developing practical tools and partnerships to help you participate more meaningfully in public life.",
-    aboutContent2: "We are creating a one-stop hub for civic engagement in Canada to address barriers like political noise, institutional distrust, social isolation, and fragmented information. Our approach is grounded in three commitments:",
-    strategicTitle: "Strategic, evidence-supported participation",
-    strategicContent: "We help you act so your voice and your vote can have the greatest impact, coordinating action that is informed and effective.",
-    democraticTitle: "Democratic confidence",
-    democraticContent: "We help rebuild trust in our democratic systems by giving you the knowledge and skills to navigate them with clarity and purpose.",
-    communityTitle: "Community power",
-    communityContent: "We cultivate and amplify community by building spaces for connection and collaboration, and by seeking partnerships with grassroots groups and local advocacy efforts.",
-    aboutContent3: "By combining strategic action, civic literacy, and strong networks, The Action Pact is building a culture of meaningful and enthusiastic participation in Canada's democracy."
+    aboutContent1: "We're building The Action Pact, and we'd love for you to help shape it from the ground up.",
+    aboutContent2: "The Action Pact is a civic engagement organization for people who care about what happens in Canada, but have run into barriers that make public participation feel confusing, exhausting, or pointless. We're working to contribute to a culture of meaningful and enthusiastic civic engagement in Canada, so more of us feel confident taking part.",
+    aboutContent3: "Our work is grounded in a commitment to action that's strategic, accessible, and collective. We're developing evidence-supported tools and civic education to help people make informed choices. We're making participation easier to understand and easier to fit into real life. And we're building spaces and partnerships that help people learn together and act together."
   },
   fr: {
     title: "Le Pacte d'Action",
@@ -102,6 +99,9 @@ const translations = {
     successDescription: (name: string, city: string) => 
       `Vous êtes inscrit !`,
     invalidEmail: "Veuillez entrer un email valide.",
+    preferredLanguage: "Langue Préférée:",
+    english: "Anglais",
+    french: "Français",
     fontOptions: "Options de Police:",
     artsyText: "Texte Artistique - Caveat Handwriting",
     handwrittenText: "Texte Manuscrit - Architects Daughter",
@@ -114,15 +114,9 @@ const translations = {
     whySubscribeContent2: "En vous inscrivant à notre liste de diffusion, vous serez les premiers à recevoir l'infolettre de The Action Pact, avec des événements et des ressources qui facilitent le passage à l'action et la connexion avec les autres.",
     whySubscribeContent3: "Ensemble, nous bâtissons une culture de participation impactante et enthousiaste à la démocratie canadienne.",
     contactUs: "Contactez-Nous:",
-    aboutContent1: "Nous en sommes aux premières étapes de la création de The Action Pact et nous vous invitons à contribuer à le façonner dès le départ. The Action Pact est une initiative d'engagement civique qui se connecte aux gens où qu'ils soient dans leur parcours démocratique. Que vous votiez pour la première fois ou que vous organisez déjà des actions dans votre communauté, nous développons des outils pratiques et des partenariats pour vous aider à donner plus d'impact à votre participation à la vie publique.",
-    aboutContent2: "Nous créons une plateforme centralisée pour l'engagement civique au Canada afin de lever des obstacles comme le brouhaha politique, la méfiance envers les institutions, l'isolement social et l'éclatement de l'information. Notre approche repose sur trois engagements :",
-    strategicTitle: "Participation stratégique et fondée sur des faits",
-    strategicContent: "Nous vous aidons à agir pour que votre voix et votre vote aient le plus grand impact possible, en coordonnant des actions éclairées et efficaces.",
-    democraticTitle: "Confiance démocratique",
-    democraticContent: "Nous contribuons à rétablir la confiance dans nos systèmes démocratiques en vous donnant les connaissances et les compétences nécessaires pour les naviguer avec clarté et détermination.",
-    communityTitle: "Pouvoir communautaire",
-    communityContent: "Nous cultivons et amplifions le pouvoir des communautés en créant des espaces de connexion et de collaboration, et en recherchant des partenariats avec des groupes locaux et des initiatives de base.",
-    aboutContent3: "En combinant action stratégique, compréhension de la vie civique et réseaux solides, The Action Pact bâtit une culture de participation impactante et enthousiaste à la démocratie canadienne."
+    aboutContent1: "Nous sommes en train de mettre en place The Action Pact, et nous aimerions que vous nous aidiez à le façonner dès le départ.",
+    aboutContent2: "The Action Pact est une organisation d'engagement civique destinée aux personnes qui se soucient de ce qui se passe au Canada, mais qui se heurtent à des obstacles qui rendent la participation publique confuse, épuisante ou inutile. Nous nous efforçons de contribuer à une culture d'engagement civique impactante et enthousiaste au Canada, afin que nous soyons plus nombreux à oser y prendre part.",
+    aboutContent3: "Notre travail repose sur un engagement en faveur d'une action stratégique, accessible et collective. Nous développons des outils fondés sur des données probantes et une éducation civique afin d'aider les gens à faire des choix éclairés. Nous rendons la participation plus facile à comprendre et à intégrer dans la vie réelle. Et nous créons des espaces et des partenariats qui aident les gens à apprendre et à agir ensemble."
   }
 };
 
@@ -130,6 +124,7 @@ const Index = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState<'en' | 'fr'>('en');
+  const [preferredLanguage, setPreferredLanguage] = useState<'en' | 'fr'>('en');
   const [cityValue, setCityValue] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -141,6 +136,32 @@ const Index = () => {
   const [showWhySubscribe, setShowWhySubscribe] = useState(false);
 
   const t = translations[language];
+
+  // Helper function to highlight specific words in red
+  const highlightWords = (text: string) => {
+    if (language === 'en') {
+      // Highlight "strategic, accessible, and collective"
+      const parts = text.split(/(strategic, accessible, and collective)/);
+      return parts.map((part, i) => 
+        part === 'strategic, accessible, and collective' 
+          ? <span key={i} className="text-primary">{part}</span>
+          : part
+      );
+    } else {
+      // Highlight "stratégique, accessible et collective"
+      const parts = text.split(/(stratégique, accessible et collective)/);
+      return parts.map((part, i) => 
+        part === 'stratégique, accessible et collective' 
+          ? <span key={i} className="text-primary">{part}</span>
+          : part
+      );
+    }
+  };
+
+  // Sync preferred language with site language
+  useEffect(() => {
+    setPreferredLanguage(language);
+  }, [language]);
 
   // Filter cities based on input and language preference
   const filterCities = (input: string) => {
@@ -228,7 +249,7 @@ const Index = () => {
   }, []);
 
   // Supabase database function
-  const sendToSupabase = async (name: string, email: string, location: string) => {
+  const sendToSupabase = async (name: string, email: string, location: string, preferredLang: 'en' | 'fr') => {
     try {
       const { data, error } = await supabase
         .from('Newsletter')
@@ -237,6 +258,7 @@ const Index = () => {
             name: name || null,
             email: email,
             location: location || null,
+            preferred_language: preferredLang,
           }
         ]);
 
@@ -271,7 +293,7 @@ const Index = () => {
     
     try {
       // Send to Supabase
-      const dbSuccess = await sendToSupabase(name, email, location);
+      const dbSuccess = await sendToSupabase(name, email, location, preferredLanguage);
       
       // Show success message
       if (dbSuccess) {
@@ -332,7 +354,11 @@ const Index = () => {
             {t.whySubscribe}
           </button>
           <button
-            onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')}
+            onClick={() => {
+              const newLang = language === 'en' ? 'fr' : 'en';
+              setLanguage(newLang);
+              setPreferredLanguage(newLang);
+            }}
             className="text-sm md:text-base hover:text-primary hover:underline transition-colors"
             aria-label={`Switch to ${language === 'en' ? 'French' : 'English'}`}
           >
@@ -352,12 +378,7 @@ const Index = () => {
               <div className="sr-only">The Action Pact — Newsletter Signup</div>
 
               <article id="signup" className="mt-1 md:mt-4 max-w-2xl">
-                <p className="marker-text text-xl md:text-3xl mb-0">{t.subtitle}</p>
-                <img 
-                  src="/images/underline.png" 
-                  alt="Decorative underline" 
-                  className="w-full max-w-sm md:max-w-lg h-auto mb-4 md:mb-8 opacity-80 -ml-16 md:-ml-24 -mt-1 md:-mt-1"
-                />
+                <p className="marker-text text-xl md:text-3xl mb-4 md:mb-8">{t.subtitle}</p>
                 
                 <form onSubmit={handleSubmit} className="space-y-2 md:space-y-8" aria-label="Newsletter signup form">
                   <div>
@@ -410,6 +431,42 @@ const Index = () => {
                     <input id="email" name="email" type="email" required className="scribble-input py-2 md:py-3 text-sm md:text-base" placeholder={t.emailPlaceholder} autoComplete="email" />
                   </div>
 
+                  <div className="pt-4 md:pt-6">
+                    <label className="scribble-label text-sm md:text-base">Language Preference</label>
+                    <div className="flex items-center gap-2 mt-2 ml-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLanguage('en');
+                          setPreferredLanguage('en');
+                        }}
+                        className={`px-2 py-1 text-xs md:text-sm border rounded transition-colors ${
+                          preferredLanguage === 'en' 
+                            ? 'bg-primary text-white border-primary' 
+                            : 'bg-transparent border-primary text-primary hover:bg-primary/10'
+                        }`}
+                        style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif', borderWidth: '2px' }}
+                      >
+                        EN
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLanguage('fr');
+                          setPreferredLanguage('fr');
+                        }}
+                        className={`px-2 py-1 text-xs md:text-sm border rounded transition-colors ${
+                          preferredLanguage === 'fr' 
+                            ? 'bg-primary text-white border-primary' 
+                            : 'bg-transparent border-primary text-primary hover:bg-primary/10'
+                        }`}
+                        style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif', borderWidth: '2px' }}
+                      >
+                        FR
+                      </button>
+                    </div>
+                  </div>
+
                   <div className="pt-6 md:pt-6 flex items-start gap-8">
                     <button type="submit" className="scribble-button py-3 md:py-4 text-base md:text-lg" disabled={loading} aria-busy={loading} aria-live="polite">
                       {loading ? t.submitting : t.submit}
@@ -437,13 +494,13 @@ const Index = () => {
             {showWhySubscribe && (
               <div className="max-w-2xl ml-auto text-justify">
                 <h2 className="text-primary text-xl md:text-2xl font-bold mb-6">{t.whySubscribe}</h2>
-                <p className="text-lg mb-6">
+                <p className="text-lg mb-6 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
                   {t.whySubscribeContent1}
                 </p>
-                <p className="text-lg mb-6">
+                <p className="text-lg mb-6 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
                   {t.whySubscribeContent2}
                 </p>
-                <p className="text-lg">
+                <p className="text-lg font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
                   {t.whySubscribeContent3}
                 </p>
               </div>
@@ -453,39 +510,16 @@ const Index = () => {
             {showAbout && (
               <div className="max-w-2xl ml-auto text-justify">
                 <h2 className="text-primary text-xl md:text-2xl font-bold mb-6">{t.aboutUs}</h2>
-                <p className="text-lg mb-6">
+                <p className="text-lg mb-6 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
                   {t.aboutContent1}
                 </p>
                 
-                <p className="text-lg mb-8">
+                <p className="text-lg mb-6 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
                   {t.aboutContent2}
                 </p>
                 
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-primary text-lg md:text-xl mb-3">{t.strategicTitle}</h3>
-                    <p className="text-base">
-                      {t.strategicContent}
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-primary text-lg md:text-xl mb-3">{t.democraticTitle}</h3>
-                    <p className="text-base">
-                      {t.democraticContent}
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-primary text-lg md:text-xl mb-3">{t.communityTitle}</h3>
-                    <p className="text-base">
-                      {t.communityContent}
-                    </p>
-                  </div>
-                </div>
-                
-                <p className="text-lg mt-6">
-                  {t.aboutContent3}
+                <p className="text-lg font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
+                  {highlightWords(t.aboutContent3)}
                 </p>
               </div>
             )}
@@ -509,13 +543,13 @@ const Index = () => {
                   </button>
                 
                 <h2 className="text-primary text-lg font-bold mb-4">{t.whySubscribe}</h2>
-                <p className="text-base mb-4">
+                <p className="text-base mb-4 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
                   {t.whySubscribeContent1}
                 </p>
-                <p className="text-base mb-4">
+                <p className="text-base mb-4 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
                   {t.whySubscribeContent2}
                 </p>
-                <p className="text-base">
+                <p className="text-base font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
                   {t.whySubscribeContent3}
                 </p>
                 </div>
@@ -535,39 +569,16 @@ const Index = () => {
                   </button>
                 
                 <h2 className="text-primary text-lg font-bold mb-4">{t.aboutUs}</h2>
-                <p className="text-base mb-4">
+                <p className="text-base mb-4 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
                   {t.aboutContent1}
                 </p>
                 
-                <p className="text-base mb-4">
+                <p className="text-base mb-4 font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
                   {t.aboutContent2}
                 </p>
                 
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-primary text-base font-medium mb-2">{t.strategicTitle}</h3>
-                    <p className="text-sm">
-                      {t.strategicContent}
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-primary text-base font-medium mb-2">{t.democraticTitle}</h3>
-                    <p className="text-sm">
-                      {t.democraticContent}
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-primary text-base font-medium mb-2">{t.communityTitle}</h3>
-                    <p className="text-sm">
-                      {t.communityContent}
-                    </p>
-                  </div>
-                </div>
-                
-                <p className="text-base mt-4">
-                  {t.aboutContent3}
+                <p className="text-base font-bold" style={{ fontFamily: 'Times New Roman, serif' }}>
+                  {highlightWords(t.aboutContent3)}
                 </p>
                 </div>
               </div>
