@@ -373,12 +373,12 @@ const Index = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
             {/* Left column - Logo and Form */}
             <div className="space-y-8">
-              <ActionPactLogo />
+              <ActionPactLogo language={language} />
               
               <div className="sr-only">The Action Pact — Newsletter Signup</div>
 
               <article id="signup" className="mt-1 md:mt-4 max-w-2xl">
-                <p className="marker-text text-xl md:text-3xl mb-4 md:mb-8">{t.subtitle}</p>
+                <p className="text-xl md:text-3xl font-bold mb-4 md:mb-8">{t.subtitle}</p>
                 
                 <form onSubmit={handleSubmit} className="space-y-2 md:space-y-8" aria-label="Newsletter signup form">
                   <div>

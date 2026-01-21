@@ -1,14 +1,26 @@
 import React from 'react';
 
-const ActionPactLogo: React.FC = () => {
+interface ActionPactLogoProps {
+  language?: 'en' | 'fr';
+}
+
+const ActionPactLogo: React.FC<ActionPactLogoProps> = ({ language = 'en' }) => {
+  const logoSrc = language === 'fr' 
+    ? '/images/newestfrenchlogo.png' 
+    : '/images/logo.png';
+  
+  const sizeClass = language === 'fr' 
+    ? 'h-[11.75rem] md:h-[19.375rem]' 
+    : 'h-48 md:h-80';
+  
   return (
-          <div className="flex items-center -ml-2 md:-ml-4">
-        <img
-          src="/images/logo.png"
-          alt="The Action Pact Logo"
-          className="h-48 md:h-80 w-auto object-contain"
-        />
-      </div>
+    <div className={`flex items-start -ml-2 md:-ml-4 ${language === 'fr' ? 'pb-[7px] md:pb-[11px]' : ''}`}>
+      <img
+        src={logoSrc}
+        alt={language === 'fr' ? "Le Pacte d'Action Logo" : "The Action Pact Logo"}
+        className={`${sizeClass} w-auto object-contain object-top`}
+      />
+    </div>
   );
 };
 
