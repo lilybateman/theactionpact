@@ -910,7 +910,7 @@ const ActiVote = () => {
       // Rank parties by win probability
       const rankedByProb = [...strategicParties].sort((a, b) => b.probability - a.probability);
       
-      // If the top-alignment party is ranked 1st or 2nd by probability, return it immediately
+      // If the top-aligned party is ranked 1st or 2nd by probability, return it immediately
       if (rankedByProb[0].partyIndex === topAlignedPartyIndex || 
           (rankedByProb.length > 1 && rankedByProb[1].partyIndex === topAlignedPartyIndex)) {
         topPartyIndex = topAlignedPartyIndex;
@@ -1232,64 +1232,52 @@ const ActiVote = () => {
                   <span className="font-semibold">Co-lead testing note</span>
                 </p>
                 <p className="text-sm text-gray-800 mb-3">
-                  Right now the page is using a toggle only strategy approach with this logic.
+                  Right now the page is using a toggle only strategy approach with this logic
                 </p>
                 
                 <div className="text-xs text-gray-700 mb-3 space-y-2">
                   <p className="font-semibold text-sm">Toggle-Only Algorithm:</p>
                   <ul className="list-disc list-inside ml-4 space-y-1">
-                    <li>Prepare two sorted lists - parties by alignment with your priorities (highest first) and parties by winning probability (highest first).</li>
-                    <li>If your top aligned party is also the most likely to win, choose that party.</li>
-                    <li>Otherwise, if your top aligned party is the second most likely to win, choose that party.</li>
-                    <li>Otherwise, find parties with probabilities within 5% of the top (tied parties). If there's a tie: If your most aligned party is in the tied contenders, choose that party. If it is not, choose the most aligned party among the tied contenders that is within 30% of your top aligned party's score.</li>
-                    <li>Otherwise (if there is not a {'>'}2 party tie), choose the party out of the top two highest probabilities that has a closer alignment score to your top aligned party, if that party's score is within 30%.</li>
+                    <li>Prepare two sorted lists - parties by alignment with user priorities (highest first) and parties by winning probability (highest first).</li>
+                    <li>If the top-aligned party is ranked 1st or 2nd by probability, return it.</li>
+                    <li>Otherwise: Strategy applies.</li>
+                    <li>If there are parties with probabilities within 5% of the top (almost tied parties) and the top-aligned party is in the tied contenders, return that party. If it is not, return the most aligned party among the tied contenders that is within 30% of your top aligned party's score.</li>
+                    <li>Otherwise (if there is not a {'>'}2 party tie), choose the party out of the top two highest probabilities that has a closer alignment score to the top-aligned party, if that party's score is within 30%.</li>
                   </ul>
                   
                   <p className="text-sm text-gray-800 mt-4 pt-2 font-semibold">Problems:</p>
                   <ul className="list-disc list-inside ml-4 space-y-1 text-xs text-gray-700 mt-2">
-                    <li>Arbitrary thresholds (30% and 5%) don't account for individual preferences and would need some sort of reasoning for the number choice</li>
-                    <li>Makes personal calls for users (e.g., what counts as a "close tie")</li>
-                    <li>No user control over strategic vs. alignment trade-offs</li>
-                    <li>All users treated the same regardless of risk tolerance</li>
+                    <li>Chosen thresholds need deep reasoning to not feel arbitrary</li>
+                    <li>Makes assumptions and personal calls for users with no user control over strategic vs. alignment trade-offs; all users treated the same regardless of risk tolerance</li>
                   </ul>
                   
                   <p className="text-sm text-gray-800 mt-4 pt-2 font-semibold">Benefits:</p>
                   <ul className="list-disc list-inside ml-4 space-y-1 text-xs text-gray-700 mt-2">
-                    <li>Simpler UI - just a toggle, no additional controls</li>
-                    <li>Less decision fatigue for politically disengaged users</li>
-                    <li>Though algorithm makes more assumptions, it is more explicit to convey</li>
-                    <li>Works well when users want a straightforward recommendation</li>
+                    <li>Simpler UI - just a toggle, no additional controls, less decision fatigue for politically disengaged users</li>
+                    <li>More explicit algorithm to convey, works well when users want straightforward recommendations</li>
                   </ul>
                   
-                  <p className="text-sm text-gray-800 mt-3">The way I could see us using this one or a toggle variation is if we are explicit about the algorithm to the user.</p>
-                  
-                  <p className="text-sm text-gray-800 mt-4 pt-2">Alternatively, toggle this blue toggle (in same box) to initiate a slider, which uses this logic</p>
+                  <p className="text-sm text-gray-800 mt-4 pt-2">Alternatively, toggle the blue toggle at the bottom of this box to initiate a slider, which uses this logic</p>
                   <p className="font-semibold text-sm mt-2">Slider Algorithm:</p>
                   <ul className="list-disc list-inside ml-4 space-y-1 text-xs text-gray-700 mt-2">
-                    <li>Find the party with the highest alignment score</li>
-                    <li>Rank parties by win probability</li>
-                    <li>If the top-alignment party is ranked 1st or 2nd by probability: Return it immediately</li>
-                    <li>Otherwise: Strategy applies</li>
-                    <li>Exclude the least-aligned party</li>
-                    <li>Slider controls how much value deviation is allowed</li>
-                    <li>From eligible parties, pick the most likely to win (weighted by slider)</li>
+                    <li>Prepare two sorted lists - parties by alignment with user priorities (highest first) and parties by winning probability (highest first).</li>
+                    <li>If the top-aligned party is ranked 1st or 2nd by probability, return it.</li>
+                    <li>Otherwise: Strategy applies.</li>
+                    <li>Exclude the least-aligned party.</li>
+                    <li>Slider controls how much value deviation is allowed.</li>
+                    <li>From eligible parties within the given permitted value deviation, return the one with the highest probability.</li>
                   </ul>
-                  <p className="text-xs text-gray-700 mt-2">The slider controls how much the user is willing to compromise their values; within that acceptable range, the tool recommends the party most likely to win — but it never recommends the user's least-aligned party, and it never forces strategy when it isn't needed.</p>
                   
                   <p className="text-sm text-gray-800 mt-4 pt-2 font-semibold">Problems:</p>
                   <ul className="list-disc list-inside ml-4 space-y-1 text-xs text-gray-700 mt-2">
-                    <li>More complex UI - requires understanding and adjusting a slider</li>
-                    <li>May be overwhelming for less politically engaged users</li>
-                    <li>Users need to understand what "strategic" means in this context</li>
-                    <li>Requires more cognitive effort to decide on slider position</li>
+                    <li>More complex UI - requires understanding and adjusting a slider, may overwhelm less politically engaged users</li>
+                    <li>Users need to understand what "strategic" means and requires more cognitive effort to decide on slider position</li>
                   </ul>
                   
                   <p className="text-sm text-gray-800 mt-4 pt-2 font-semibold">Benefits:</p>
                   <ul className="list-disc list-inside ml-4 space-y-1 text-xs text-gray-700 mt-2">
-                    <li>Gives users control over their strategic vs. alignment preferences</li>
-                    <li>Personalized recommendations based on individual risk tolerance</li>
-                    <li>No arbitrary thresholds - user decides acceptable compromise level</li>
-                    <li>More transparent - users can see how their choice affects the recommendation</li>
+                    <li>Gives users control over their strategic vs. alignment preferences with personalized recommendations based on individual risk tolerance</li>
+                    <li>No ambiguous thresholds - user decides acceptable compromise level, more transparent as users can see how their choice affects the recommendation</li>
                   </ul>
                 </div>
                 
