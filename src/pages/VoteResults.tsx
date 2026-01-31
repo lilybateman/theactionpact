@@ -163,14 +163,23 @@ const VoteResults = ({ lang }: VoteResultsProps) => {
           </div>
         ) : totalVotes > 0 ? (
           <div 
-            className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-80 lg:h-80 xl:w-96 xl:h-96 rounded-3xl flex items-center justify-center shadow-xl border border-gray-300 mb-8 sm:mb-10 lg:mb-12 overflow-hidden"
+            className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-80 lg:h-80 xl:w-96 xl:h-96 rounded-3xl flex items-center justify-center shadow-xl mb-8 sm:mb-10 lg:mb-12 overflow-hidden relative"
             style={{ 
               boxShadow: '0 10px 40px rgba(0,0,0,0.2), inset 0 2px 20px rgba(255,255,255,0.8)',
-              background: 'linear-gradient(to right, #e5e7eb 0%, #e5e7eb 50%, #fde047 50%, #fde047 100%)'
             }}
           >
+            {/* Silver half */}
+            <div 
+              className="absolute inset-0 w-1/2 bg-gradient-to-br from-gray-200 via-white via-40% to-gray-400"
+              style={{ boxShadow: 'inset 0 2px 20px rgba(255,255,255,0.8)' }}
+            />
+            {/* Gold half */}
+            <div 
+              className="absolute inset-0 left-1/2 w-1/2 bg-gradient-to-br from-yellow-300 via-yellow-100 via-40% to-yellow-500"
+              style={{ boxShadow: 'inset 0 2px 20px rgba(255,255,255,0.8)' }}
+            />
             <span 
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 text-center px-4 drop-shadow-sm"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 text-center px-4 drop-shadow-sm relative z-10"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               {t.tie}
