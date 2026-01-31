@@ -102,7 +102,7 @@ const VoteResults = ({ lang }: VoteResultsProps) => {
       const { error } = await supabase
         .from(tableName)
         .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all rows (neq with impossible value)
+        .gte('id', 0); // Delete all rows
 
       if (error) {
         console.error('Error resetting votes:', error);
