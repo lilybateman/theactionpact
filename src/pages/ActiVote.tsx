@@ -977,16 +977,13 @@ const ActiVote = () => {
   return (
     <>
       <header className="container py-4 md:py-6 flex items-center justify-end">
-        <div className="flex items-center gap-4 w-full justify-between">
+        <div className="flex items-center gap-4 w-full">
           <a href="/" className="flex items-center">
             <img
               src="/images/logo.png"
               alt="The Action Pact Logo"
               className="h-24 md:h-32 w-auto object-contain"
             />
-          </a>
-          <a href="/" className="text-base md:text-lg hover:text-primary hover:underline transition-colors">
-            Back to Home
           </a>
         </div>
       </header>
