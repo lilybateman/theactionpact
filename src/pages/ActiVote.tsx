@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/lib/supabase";
 
 const ActiVote = () => {
@@ -21,8 +20,7 @@ const ActiVote = () => {
   const [jobs, setJobs] = useState([0]);
   const [healthcare, setHealthcare] = useState([0]);
   
-  // Strategic voting
-  const [strategicVoting, setStrategicVoting] = useState(false);
+  // Postal code and district data
   const [postalCode, setPostalCode] = useState("");
   const [districtProbabilities, setDistrictProbabilities] = useState<{
     PCP: number | null;
@@ -33,8 +31,8 @@ const ActiVote = () => {
   const [districtName, setDistrictName] = useState<string | null>(null);
   const [loadingProbabilities, setLoadingProbabilities] = useState(false);
   const [candidateNames, setCandidateNames] = useState<Record<string, string>>({}); // PartyCode -> CandidateName
-  const [useSliderStrategy, setUseSliderStrategy] = useState(false); // Toggle between toggle-only and slider strategies
-  const [strategicSlider, setStrategicSlider] = useState([0.5]); // Slider value 0-1, where 0 = less strategic, 1 = more strategic
+  const [strategicSlider, setStrategicSlider] = useState([0]); // Slider value 0-1, where 0 = not strategic (alignment only), 1 = more strategic
+  const [infoPopoverOpen, setInfoPopoverOpen] = useState(false);
 
   // Matrix for party calculation
   // Rows: PC, NDP, Liberal, Green
@@ -102,13 +100,12 @@ const ActiVote = () => {
   useEffect(() => {
     const fetchDistrictProbabilities = async () => {
       console.log('🚀 fetchDistrictProbabilities called', {
-        strategicVoting,
         postalCode,
         postalCodeLength: postalCode?.length || 0
       });
       
-      if (!strategicVoting || !postalCode) {
-        console.log('   ⏸️  Skipping fetch - strategic voting off or no postal code');
+      if (!postalCode) {
+        console.log('   ⏸️  Skipping fetch - no postal code');
         setDistrictProbabilities(null);
         setDistrictName(null);
         setCandidateNames({});
@@ -838,7 +835,7 @@ const ActiVote = () => {
     };
 
     fetchDistrictProbabilities();
-  }, [strategicVoting, postalCode]);
+  }, [postalCode]);
 
   // Check if all sliders are 0
   const allZero = climate[0] === 0 && housing[0] === 0 && jobs[0] === 0 && healthcare[0] === 0;
@@ -846,24 +843,23 @@ const ActiVote = () => {
   // Check if postal code is valid: require 6 characters (ignoring spaces)
   const normalizedPostal = postalCode.replace(/\s+/g, '').toUpperCase();
   const postalCodeValid = normalizedPostal.length === 6;
-  // If strategic voting is enabled, require valid postal code and probabilities; otherwise, use slider logic
-  const shouldShowResults = strategicVoting ? (postalCodeValid && districtProbabilities !== null) : !allZero;
+  // Always require valid postal code and district probabilities to show results
+  const shouldShowResults = postalCodeValid && districtProbabilities !== null && !allZero;
   
   // Debug logging for UI state
   useEffect(() => {
-    if (strategicVoting) {
-      console.log('🎯 UI State Debug:', {
-        postalCode,
-        normalizedPostal,
-        postalCodeValid,
-        districtName,
-        districtProbabilities: districtProbabilities !== null,
-        candidateNames: Object.keys(candidateNames).length,
-        shouldShowResults,
-        loadingProbabilities
-      });
-    }
-  }, [strategicVoting, postalCode, postalCodeValid, districtName, districtProbabilities, candidateNames, shouldShowResults, loadingProbabilities]);
+    console.log('🎯 UI State Debug:', {
+      postalCode,
+      normalizedPostal,
+      postalCodeValid,
+      districtName,
+      districtProbabilities: districtProbabilities !== null,
+      candidateNames: Object.keys(candidateNames).length,
+      shouldShowResults,
+      loadingProbabilities,
+      allZero
+    });
+  }, [postalCode, postalCodeValid, districtName, districtProbabilities, candidateNames, shouldShowResults, loadingProbabilities, allZero, normalizedPostal]);
 
   const scores = calculatePartyScores();
   
@@ -888,188 +884,91 @@ const ActiVote = () => {
     { partyIndex: 3, partyName: 'Green', probability: districtProbabilities.GPO ?? 0 }, // GPO
   ].sort((a, b) => b.probability - a.probability) : [];
 
-  // Strategic voting logic
+  // Strategic voting logic - always use slider algorithm
   let topPartyIndex: number;
   let topParty: { name: string; candidateName: string; color: string };
   
-  if (strategicVoting && strategicParties.length > 0 && alignedParties.length > 0) {
-    // Check if using slider strategy
-    if (useSliderStrategy) {
-      // Slider Algorithm Implementation
-      const sliderValue = strategicSlider[0]; // Get slider value (0-1)
+  const sliderValue = strategicSlider[0]; // Get slider value (0-1)
+  
+  // If we have district probabilities and slider is above 0, use strategic algorithm
+  if (strategicParties.length > 0 && alignedParties.length > 0 && sliderValue > 0) {
+    // Slider Algorithm Implementation
+    // Find the party with the highest alignment score (topParty)
+    const topAlignedParty = alignedParties[0];
+    const topAlignedPartyIndex = topAlignedParty.partyIndex;
+    const topAlignedPartyScore = topAlignedParty.rubricScore;
+    
+    // Find the party with the lowest alignment score (worstParty)
+    const worstParty = alignedParties[alignedParties.length - 1];
+    const worstPartyIndex = worstParty.partyIndex;
+    
+    // Normalize alignment scores to 0-1 scale for fair comparison with probabilities
+    const maxAlignmentScore = Math.max(...alignedParties.map(p => p.rubricScore));
+    const minAlignmentScore = Math.min(...alignedParties.map(p => p.rubricScore));
+    const alignmentRange = maxAlignmentScore - minAlignmentScore;
+    
+    // Rank parties by win probability
+    const rankedByProb = [...strategicParties].sort((a, b) => b.probability - a.probability);
+    
+    // If the top-aligned party is ranked 1st or 2nd by probability, return it immediately
+    if (rankedByProb[0].partyIndex === topAlignedPartyIndex || 
+        (rankedByProb.length > 1 && rankedByProb[1].partyIndex === topAlignedPartyIndex)) {
+      topPartyIndex = topAlignedPartyIndex;
+      topParty = parties[topPartyIndex];
+    } else {
+      // Strategy applies
+      // Exclude the least-aligned party
+      // Slider controls how much value deviation is allowed
+      // At slider = 0: require 100% of top score, at slider = 1: require 0% (allow all except worst)
+      const minValuesAgreement = topAlignedPartyScore * (1 - sliderValue);
       
-      // Find the party with the highest alignment score (topParty)
-      const topAlignedParty = alignedParties[0];
-      const topAlignedPartyIndex = topAlignedParty.partyIndex;
-      const topAlignedPartyScore = topAlignedParty.rubricScore;
-      
-      // Find the party with the lowest alignment score (worstParty)
-      const worstParty = alignedParties[alignedParties.length - 1];
-      const worstPartyIndex = worstParty.partyIndex;
-      
-      // Rank parties by win probability
-      const rankedByProb = [...strategicParties].sort((a, b) => b.probability - a.probability);
-      
-      // If the top-aligned party is ranked 1st or 2nd by probability, return it immediately
-      if (rankedByProb[0].partyIndex === topAlignedPartyIndex || 
-          (rankedByProb.length > 1 && rankedByProb[1].partyIndex === topAlignedPartyIndex)) {
-        topPartyIndex = topAlignedPartyIndex;
-        topParty = parties[topPartyIndex];
-      } else {
-        // Strategy applies
-        // Exclude the least-aligned party
-        // Slider controls how much value deviation is allowed
-        const minValuesAgreement = topAlignedPartyScore * (1 - 0.5 * sliderValue);
+      // Create a map of party index to normalized alignment score and probability
+      const partyData = new Map();
+      alignedParties.forEach(p => {
+        // Normalize alignment score to 0-1 scale
+        const normalizedAlignment = alignmentRange > 0 
+          ? (p.rubricScore - minAlignmentScore) / alignmentRange 
+          : 0.5; // If all scores are the same, use 0.5
         
-        // Create a map of party index to alignment score and probability
-        const partyData = new Map();
-        alignedParties.forEach(p => {
-          partyData.set(p.partyIndex, {
-            alignmentScore: p.rubricScore,
-            probability: strategicParties.find(sp => sp.partyIndex === p.partyIndex)?.probability ?? 0
-          });
+        const probability = strategicParties.find(sp => sp.partyIndex === p.partyIndex)?.probability ?? 0;
+        
+        partyData.set(p.partyIndex, {
+          alignmentScore: p.rubricScore, // Keep original for threshold check
+          normalizedAlignment, // Normalized for weighted calculation
+          probability
+        });
+      });
+      
+      // Filter eligible parties: not worstParty and alignmentScore >= minValuesAgreement
+      const eligibleParties = Array.from(partyData.entries())
+        .filter(([index, data]) => 
+          index !== worstPartyIndex && data.alignmentScore >= minValuesAgreement
+        );
+      
+      if (eligibleParties.length > 0) {
+        // From eligible parties, pick the one with highest weighted score
+        // Use normalized values so alignment and probability are on the same scale
+        // score = (1 - slider) * normalizedAlignment + slider * probability
+        const bestParty = eligibleParties.reduce((best, current) => {
+          const [bestIndex, bestData] = best;
+          const [currentIndex, currentData] = current;
+          
+          const bestScore = (1 - sliderValue) * bestData.normalizedAlignment + sliderValue * bestData.probability;
+          const currentScore = (1 - sliderValue) * currentData.normalizedAlignment + sliderValue * currentData.probability;
+          
+          return currentScore > bestScore ? current : best;
         });
         
-        // Filter eligible parties: not worstParty and alignmentScore >= minValuesAgreement
-        const eligibleParties = Array.from(partyData.entries())
-          .filter(([index, data]) => 
-            index !== worstPartyIndex && data.alignmentScore >= minValuesAgreement
-          );
-        
-        if (eligibleParties.length > 0) {
-          // From eligible parties, pick the one with highest weighted score
-          // score = (1 - slider) * alignmentScore + slider * probability
-          const bestParty = eligibleParties.reduce((best, current) => {
-            const [bestIndex, bestData] = best;
-            const [currentIndex, currentData] = current;
-            
-            const bestScore = (1 - sliderValue) * bestData.alignmentScore + sliderValue * bestData.probability;
-            const currentScore = (1 - sliderValue) * currentData.alignmentScore + sliderValue * currentData.probability;
-            
-            return currentScore > bestScore ? current : best;
-          });
-          
-          topPartyIndex = bestParty[0];
-          topParty = parties[topPartyIndex];
-        } else {
-          // Fallback: if no eligible parties, use top aligned party
-          topPartyIndex = topAlignedPartyIndex;
-          topParty = parties[topPartyIndex];
-        }
-      }
-    } else {
-      // Original toggle-only algorithm
-      // party_v = parties sorted by values (alignment with user's priorities)
-      const party_v = alignedParties;
-      // party_p = parties sorted by probabilities (likelihood to win)
-      const party_p = strategicParties;
-      
-      // Get the party indices (not just the sorted arrays)
-      const party_v_0_index = party_v[0].partyIndex;
-      const party_p_0_index = party_p[0].partyIndex;
-      const party_p_1_index = party_p.length > 1 ? party_p[1].partyIndex : -1;
-      
-      // Rule 1: If party_v[0] == party_p[0], return party_v[0]
-      if (party_v_0_index === party_p_0_index) {
-        topPartyIndex = party_v_0_index;
-      }
-      // Rule 2: If party_v[0] == party_p[1], return party_v[0]
-      else if (party_v_0_index === party_p_1_index) {
-        topPartyIndex = party_v_0_index;
-      }
-      // Rule 3: Look for close ties in probabilities, then choose party from party_v with least score distance from party_v[0]
-      else {
-        // Find close ties in probabilities (parties with similar winning probabilities)
-        // Consider parties "tied" if their probabilities are within a small threshold (e.g., 5%)
-        const topProbability = party_p[0].probability;
-        const probabilityThreshold = 0.05; // 5% threshold for considering a tie
-        
-        const tiedParties = party_p.filter(p => 
-          Math.abs(p.probability - topProbability) <= probabilityThreshold
-        );
-        
-        // If there's a tie, check if party_v[0] is in the tied contenders
-        if (tiedParties.length > 1) {
-        const tiedPartyIndices = new Set(tiedParties.map(p => p.partyIndex));
-        
-        // Check if the top aligned party (party_v[0]) is in the tied contenders
-        if (tiedPartyIndices.has(party_v_0_index)) {
-          // If their most aligned party is IN the top tied contenders, return that party
-          topPartyIndex = party_v_0_index;
-        } else {
-          // If it is not, return the most aligned party to the candidate within 30%
-          const party_v_0_score = party_v[0].rubricScore;
-          
-          // Find parties from party_v that are in the tied group
-          const candidateParties = party_v.filter(p => tiedPartyIndices.has(p.partyIndex));
-          
-          if (candidateParties.length > 0) {
-            // Calculate score distance and percentage difference from party_v[0] for each candidate
-            const candidatesWithDistance = candidateParties.map(p => ({
-              partyIndex: p.partyIndex,
-              scoreDistance: Math.abs(p.rubricScore - party_v_0_score),
-              scoreDifferencePercent: party_v_0_score > 0 ? (Math.abs(p.rubricScore - party_v_0_score) / party_v_0_score) * 100 : 100
-            }));
-            
-            // Filter to only candidates within 30%
-            const candidatesWithin30 = candidatesWithDistance.filter(c => c.scoreDifferencePercent <= 30);
-            
-            if (candidatesWithin30.length > 0) {
-              // Choose the one with the least score distance (most aligned)
-              const bestCandidate = candidatesWithin30.reduce((best, current) => 
-                current.scoreDistance < best.scoreDistance ? current : best
-              );
-              topPartyIndex = bestCandidate.partyIndex;
-            } else {
-              // If no candidates within 30%, use the top aligned party
-              topPartyIndex = party_v_0_index;
-            }
-          } else {
-            // Fallback: if no aligned parties are in the tie, use the top aligned party
-            topPartyIndex = party_v_0_index;
-          }
-        }
-        } else {
-          // No close tie: choose the party from top 2 probabilities with closest alignment score to party_v[0]
-          // unless that score is too far away (more than 30% difference)
-          const topTwoProbabilities = party_p.slice(0, 2); // Top 2 parties by probability
-          const topTwoIndices = new Set(topTwoProbabilities.map(p => p.partyIndex));
-          
-          // Find parties from party_v that are in the top 2 probabilities
-          const candidateParties = party_v.filter(p => topTwoIndices.has(p.partyIndex));
-          
-          if (candidateParties.length > 0) {
-            const party_v_0_score = party_v[0].rubricScore;
-            
-            // Calculate score distance from party_v[0] for each candidate
-            const candidatesWithDistance = candidateParties.map(p => ({
-              partyIndex: p.partyIndex,
-              scoreDistance: Math.abs(p.rubricScore - party_v_0_score),
-              scoreDifferencePercent: party_v_0_score > 0 ? (Math.abs(p.rubricScore - party_v_0_score) / party_v_0_score) * 100 : 100
-            }));
-            
-            // Choose the one with the least score distance
-            const bestCandidate = candidatesWithDistance.reduce((best, current) => 
-              current.scoreDistance < best.scoreDistance ? current : best
-            );
-            
-            // If the best candidate is within 30% of party_v[0]'s score, use it; otherwise use party_v[0]
-            if (bestCandidate.scoreDifferencePercent <= 30) {
-              topPartyIndex = bestCandidate.partyIndex;
-            } else {
-              topPartyIndex = party_v_0_index;
-            }
-          } else {
-            // Fallback: if no aligned parties are in top 2 probabilities, use the top aligned party
-            topPartyIndex = party_v_0_index;
-          }
-        }
-        
+        topPartyIndex = bestParty[0];
+        topParty = parties[topPartyIndex];
+      } else {
+        // Fallback: if no eligible parties, use top aligned party
+        topPartyIndex = topAlignedPartyIndex;
         topParty = parties[topPartyIndex];
       }
     }
   } else {
-    // Fallback to regular slider-based logic when strategic voting is off or data unavailable
+    // When slider is at 0 or no district data: use alignment scores only (not strategic)
     const maxScore = totalScore > 0 ? Math.max(...normalizedScores) : 0;
     topPartyIndex = totalScore > 0 ? normalizedScores.indexOf(maxScore) : 0;
     topParty = parties[topPartyIndex];
@@ -1086,25 +985,27 @@ const ActiVote = () => {
               className="h-24 md:h-32 w-auto object-contain"
             />
           </a>
-          <a href="/" className="text-sm md:text-base hover:text-primary hover:underline transition-colors">
+          <a href="/" className="text-base md:text-lg hover:text-primary hover:underline transition-colors">
             Back to Home
           </a>
         </div>
       </header>
-      <main className="container py-8 overflow-y-auto max-w-7xl mx-auto">
-        <h1 className="text-5xl md:text-6xl font-bold mb-6 text-center text-primary">ActiVote</h1>
+      <main className="container py-10 md:py-14 overflow-y-auto max-w-7xl mx-auto px-4 sm:px-6">
+        <h1 className="text-6xl md:text-7xl font-bold mb-10 md:mb-14 text-center text-primary tracking-tight">ActiVote</h1>
 
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Left Column - Sliders */}
-          <div>
-            <h2 className="text-2xl font-bold mb-6">Rate Your Priorities (0-5)</h2>
-            <div className="space-y-6">
+        {/* Two Column Layout - asymmetric emphasis on results */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-stretch">
+          {/* Left Column - Sliders in a raised panel */}
+          <div className="lg:col-span-6 lg:self-start">
+            <div className="relative rounded-3xl border-2 border-gray-300 bg-transparent pt-4 px-6 pb-4 md:pt-5 md:px-8 md:pb-5 shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-2">Score how important each issue is to you</h2>
+              <p className="text-lg text-black mb-8">0 = not important, 5 = very important</p>
+              <div className="space-y-8">
               {/* Climate Slider */}
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="text-base font-medium">Climate</label>
-                  <span className="text-base font-bold text-primary">{climate[0]}/5</span>
+                <div className="flex justify-between items-center mb-3">
+                  <label className="text-xl font-medium">Climate</label>
+                  <span className="text-xl font-bold text-primary">{climate[0]}/5</span>
                 </div>
                 <Slider
                   value={climate}
@@ -1112,15 +1013,15 @@ const ActiVote = () => {
                   min={0}
                   max={5}
                   step={1}
-                  className="[&_.absolute.h-full]:!bg-primary [&_[role=slider]]:!bg-primary [&_[role=slider]]:!border-primary"
+                  className="[&_.relative.h-2]:border-2 [&_.relative.h-2]:border-gray-300 [&_.relative.h-2]:rounded-full [&_.absolute.h-full]:!bg-primary [&_[role=slider]]:!bg-primary [&_[role=slider]]:!border-primary"
                 />
               </div>
 
               {/* Housing Slider */}
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="text-base font-medium">Housing</label>
-                  <span className="text-base font-bold text-primary">{housing[0]}/5</span>
+                <div className="flex justify-between items-center mb-3">
+                  <label className="text-xl font-medium">Housing</label>
+                  <span className="text-xl font-bold text-primary">{housing[0]}/5</span>
                 </div>
                 <Slider
                   value={housing}
@@ -1128,15 +1029,15 @@ const ActiVote = () => {
                   min={0}
                   max={5}
                   step={1}
-                  className="[&_.absolute.h-full]:!bg-primary [&_[role=slider]]:!bg-primary [&_[role=slider]]:!border-primary"
+                  className="[&_.relative.h-2]:border-2 [&_.relative.h-2]:border-gray-300 [&_.relative.h-2]:rounded-full [&_.absolute.h-full]:!bg-primary [&_[role=slider]]:!bg-primary [&_[role=slider]]:!border-primary"
                 />
               </div>
 
               {/* Jobs Slider */}
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="text-base font-medium">Jobs</label>
-                  <span className="text-base font-bold text-primary">{jobs[0]}/5</span>
+                <div className="flex justify-between items-center mb-3">
+                  <label className="text-xl font-medium">Jobs</label>
+                  <span className="text-xl font-bold text-primary">{jobs[0]}/5</span>
                 </div>
                 <Slider
                   value={jobs}
@@ -1144,15 +1045,15 @@ const ActiVote = () => {
                   min={0}
                   max={5}
                   step={1}
-                  className="[&_.absolute.h-full]:!bg-primary [&_[role=slider]]:!bg-primary [&_[role=slider]]:!border-primary"
+                  className="[&_.relative.h-2]:border-2 [&_.relative.h-2]:border-gray-300 [&_.relative.h-2]:rounded-full [&_.absolute.h-full]:!bg-primary [&_[role=slider]]:!bg-primary [&_[role=slider]]:!border-primary"
                 />
               </div>
 
               {/* Healthcare Slider */}
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="text-base font-medium">Healthcare</label>
-                  <span className="text-base font-bold text-primary">{healthcare[0]}/5</span>
+                <div className="flex justify-between items-center mb-3">
+                  <label className="text-xl font-medium">Healthcare</label>
+                  <span className="text-xl font-bold text-primary">{healthcare[0]}/5</span>
                 </div>
                 <Slider
                   value={healthcare}
@@ -1160,208 +1061,166 @@ const ActiVote = () => {
                   min={0}
                   max={5}
                   step={1}
-                  className="[&_.absolute.h-full]:!bg-primary [&_[role=slider]]:!bg-primary [&_[role=slider]]:!border-primary"
+                  className="[&_.relative.h-2]:border-2 [&_.relative.h-2]:border-gray-300 [&_.relative.h-2]:rounded-full [&_.absolute.h-full]:!bg-primary [&_[role=slider]]:!bg-primary [&_[role=slider]]:!border-primary"
                 />
               </div>
 
-              {/* Strategic Voting Toggle */}
-              <div className="flex items-center gap-3 mt-4 flex-nowrap">
+              {/* Postal Code Input - Always Required */}
+              <div className="flex items-center gap-3 mt-4 pt-2">
+                <label className="text-xl font-medium">Postal Code</label>
                 <div className="flex items-center gap-2">
-                  <Switch
-                    id="strategic"
-                    checked={strategicVoting}
-                    onCheckedChange={setStrategicVoting}
-                    className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-input [&>span]:border-2 [&>span]:border-foreground self-center align-middle leading-none"
+                  <input
+                    type="text"
+                    value={postalCode}
+                    onChange={(e) => setPostalCode(e.target.value)}
+                    placeholder="Required"
+                    className={`px-3 text-base border-2 border-foreground rounded-md w-28 h-10 self-center focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 transition-all ${
+                      loadingProbabilities ? 'opacity-50' : ''
+                    }`}
+                    style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif' }}
+                    disabled={loadingProbabilities}
+                    required
                   />
-                  <label htmlFor="strategic" className="text-sm font-medium cursor-pointer text-primary leading-none">
-                    Strategic Voting
-                  </label>
+                  {loadingProbabilities && (
+                    <span className="text-base text-gray-500">Loading...</span>
+                  )}
+                  {!loadingProbabilities && postalCodeValid && districtProbabilities === null && postalCode.length > 0 && (
+                    <span className="text-base text-red-600">Not found</span>
+                  )}
                 </div>
-                {strategicVoting ? (
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={postalCode}
-                      onChange={(e) => setPostalCode(e.target.value)}
-                      placeholder="Postal Code"
-                      className={`px-2 text-xs border-2 border-foreground rounded w-24 h-8 self-center focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 transition-all ${
-                        loadingProbabilities ? 'opacity-50' : ''
-                      }`}
-                      style={{ fontFamily: '"Fraunces", ui-serif, Georgia, serif' }}
-                      disabled={loadingProbabilities}
-                    />
-                    {loadingProbabilities && (
-                      <span className="text-xs text-gray-500">Loading...</span>
-                    )}
-                    {!loadingProbabilities && postalCodeValid && districtProbabilities === null && postalCode.length > 0 && (
-                      <span className="text-xs text-red-600">Not found</span>
-                    )}
-                  </div>
-                ) : (
-                  // Reserve space so the row height doesn't change when toggled on
-                  <div className="w-24 h-8 self-center" />
-                )}
               </div>
-              
-              {/* Strategic Slider (only shown when strategic voting is on and slider strategy is enabled) */}
-              {strategicVoting && useSliderStrategy && (
-                <div className="mt-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-primary">Less Strategic</span>
-                    <span className="text-sm font-medium text-primary">More Strategic</span>
+
+              {/* Strategic Voting Slider - Always shown */}
+              <div className="mt-6">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-lg font-medium text-primary">Match based on scores</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-lg font-medium text-primary">Strategic</span>
+                    <button
+                      type="button"
+                      onClick={() => setInfoPopoverOpen(true)}
+                      className="inline-flex h-6 w-6 items-center justify-center rounded-full border-2 border-primary bg-background text-primary hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
+                      aria-label="How the strategic voting slider works"
+                    >
+                      <span className="text-base font-semibold">i</span>
+                    </button>
                   </div>
-                  <Slider
-                    value={strategicSlider}
-                    onValueChange={setStrategicSlider}
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    className="[&_.absolute.h-full]:!bg-primary [&_[role=slider]]:!bg-primary [&_[role=slider]]:!border-primary"
-                  />
                 </div>
-              )}
+                <Slider
+                  value={strategicSlider}
+                  onValueChange={setStrategicSlider}
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  className="[&_.relative.h-2]:border-2 [&_.relative.h-2]:border-gray-300 [&_.relative.h-2]:rounded-full [&_.absolute.h-full]:!bg-primary [&_[role=slider]]:!bg-primary [&_[role=slider]]:!border-primary"
+                />
+              </div>
               
               {/* Disclaimer */}
-              <p className="text-sm font-medium text-primary mb-4" style={{ paddingTop: '2px' }}>
+              <p className="text-base font-medium text-primary mb-0 pt-0 -mt-3 sm:whitespace-nowrap">
                 Disclaimer: This tool uses historical data and is currently in beta testing.
               </p>
-              
-              {/* Co-lead Testing Note */}
-              <div className="bg-blue-100 border-2 border-blue-400 rounded-lg p-4 mt-4" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
-                <p className="text-sm text-gray-800 mb-3">
-                  <span className="font-semibold">Co-lead testing note</span>
-                </p>
-                <p className="text-sm text-gray-800 mb-3">
-                  Right now the page is using a toggle only strategy approach with this logic
-                </p>
-                
-                <div className="text-xs text-gray-700 mb-3 space-y-2">
-                  <p className="font-semibold text-sm">Toggle-Only Algorithm:</p>
-                  <ul className="list-disc list-inside ml-4 space-y-1">
-                    <li>Prepare two sorted lists - parties by alignment with user priorities (highest first) and parties by winning probability (highest first).</li>
-                    <li>If the top-aligned party is ranked 1st or 2nd by probability, return it.</li>
-                    <li>Otherwise: Strategy applies.</li>
-                    <li>If there are parties with probabilities within 5% of the top (almost tied parties) and the top-aligned party is in the tied contenders, return that party. If it is not, return the most aligned party among the tied contenders that is within 30% of your top aligned party's score.</li>
-                    <li>Otherwise (if there is not a {'>'}2 party tie), choose the party out of the top two highest probabilities that has a closer alignment score to the top-aligned party, if that party's score is within 30%.</li>
-                  </ul>
-                  
-                  <p className="text-sm text-gray-800 mt-4 pt-2 font-semibold">Problems:</p>
-                  <ul className="list-disc list-inside ml-4 space-y-1 text-xs text-gray-700 mt-2">
-                    <li>Chosen thresholds need deep reasoning to not feel arbitrary</li>
-                    <li>Makes assumptions and personal calls for users with no user control over strategic vs. alignment trade-offs; all users treated the same regardless of risk tolerance</li>
-                  </ul>
-                  
-                  <p className="text-sm text-gray-800 mt-4 pt-2 font-semibold">Benefits:</p>
-                  <ul className="list-disc list-inside ml-4 space-y-1 text-xs text-gray-700 mt-2">
-                    <li>Simpler UI - just a toggle, no additional controls, less decision fatigue for politically disengaged users</li>
-                    <li>More explicit algorithm to convey, works well when users want straightforward recommendations</li>
-                  </ul>
-                  
-                  <p className="text-sm text-gray-800 mt-4 pt-2">Alternatively, toggle the blue toggle at the bottom of this box to initiate a slider, which uses this logic</p>
-                  <p className="font-semibold text-sm mt-2">Slider Algorithm:</p>
-                  <ul className="list-disc list-inside ml-4 space-y-1 text-xs text-gray-700 mt-2">
-                    <li>Prepare two sorted lists - parties by alignment with user priorities (highest first) and parties by winning probability (highest first).</li>
-                    <li>If the top-aligned party is ranked 1st or 2nd by probability, return it.</li>
-                    <li>Otherwise: Strategy applies.</li>
-                    <li>Exclude the least-aligned party.</li>
-                    <li>Slider controls how much value deviation is allowed.</li>
-                    <li>From eligible parties within the given permitted value deviation, return the one with the highest probability.</li>
-                  </ul>
-                  
-                  <p className="text-sm text-gray-800 mt-4 pt-2 font-semibold">Problems:</p>
-                  <ul className="list-disc list-inside ml-4 space-y-1 text-xs text-gray-700 mt-2">
-                    <li>More complex UI - requires understanding and adjusting a slider, may overwhelm less politically engaged users</li>
-                    <li>Users need to understand what "strategic" means and requires more cognitive effort to decide on slider position</li>
-                  </ul>
-                  
-                  <p className="text-sm text-gray-800 mt-4 pt-2 font-semibold">Benefits:</p>
-                  <ul className="list-disc list-inside ml-4 space-y-1 text-xs text-gray-700 mt-2">
-                    <li>Gives users control over their strategic vs. alignment preferences with personalized recommendations based on individual risk tolerance</li>
-                    <li>No ambiguous thresholds - user decides acceptable compromise level, more transparent as users can see how their choice affects the recommendation</li>
-                  </ul>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <Switch
-                    id="slider-strategy"
-                    checked={useSliderStrategy}
-                    onCheckedChange={setUseSliderStrategy}
-                    className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-300 [&>span]:border-2 [&>span]:border-blue-600"
-                  />
-                  <label htmlFor="slider-strategy" className="text-sm font-medium cursor-pointer text-blue-700">
-                    Use Slider Strategy
-                  </label>
-                </div>
               </div>
+
+              {/* Info overlay - covers whole scoring box when i is clicked */}
+              {infoPopoverOpen && (
+                <div className="absolute inset-0 z-10 rounded-3xl bg-background border-2 border-gray-300 p-6 overflow-auto flex flex-col shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
+                  <button
+                    type="button"
+                    onClick={() => setInfoPopoverOpen(false)}
+                    className="self-end mb-4 p-1 text-primary hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-opacity"
+                    aria-label="Close"
+                  >
+                    <span className="text-4xl font-medium leading-none">×</span>
+                  </button>
+                  <div className="space-y-5 flex-1" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                    <p className="text-2xl font-semibold text-gray-900">
+                      How the slider works
+                    </p>
+                    <ul className="list-disc list-inside space-y-3 text-lg text-gray-700">
+                      <li>When slider is at 0: Recommendations are based only on alignment with your priorities (not strategic).</li>
+                      <li>When slider is above 0: We use two lists — parties by alignment (your priorities) and parties by win probability in your district.</li>
+                      <li>If your top-aligned party is 1st or 2nd by probability, we recommend them.</li>
+                      <li>Otherwise: Strategy applies. We exclude the least-aligned party.</li>
+                      <li>The slider controls how much value deviation is allowed.</li>
+                      <li>From eligible parties, we pick the one with the highest weighted score (alignment + probability).</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Right Column - Results */}
-          <div>
-            {strategicVoting && districtName && (
-              <p className="text-center text-base md:text-lg text-gray-700 mb-2">
+          <div className="lg:col-span-6 lg:sticky lg:top-8 h-full flex flex-col min-h-0">
+            {districtName && (
+              <p className="text-center text-lg md:text-xl text-black mb-0 -mt-2">
                 District of <span className="font-semibold">{districtName}</span>
               </p>
             )}
-            <h2 className="text-2xl font-bold mb-6 text-center">Your Top Match</h2>
-            {/* Show results if strategic voting is enabled and postal code is valid, or if sliders are used */}
+            {/* Show results if postal code is valid and district probabilities are loaded and sliders are used */}
             {shouldShowResults ? (
-              <>
-                <div className="bg-gradient-to-br from-red-50 to-red-100 border-4 border-red-600 rounded-lg p-8 shadow-xl mb-6">
-                  {/* Candidate Icon */}
-                  <div className="flex justify-center mb-4">
-                    <div className="w-24 h-24 rounded-full bg-gray-300 border-4 border-gray-400 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                    </div>
+              <div className="flex flex-col flex-1 min-h-0">
+                <div className="relative bg-gradient-to-br from-red-50 to-red-100 border-4 border-red-600 rounded-3xl p-8 md:p-10 shadow-[0_8px_40px_rgba(0,0,0,0.08)] mb-8 shrink-0">
+                  <div className="absolute top-8 right-6 -rotate-6 border-2 border-red-600 bg-white/90 px-4 py-2 rounded shadow-sm" style={{ fontFamily: 'var(--font-display)' }}>
+                    <span className="text-2xl font-bold text-red-600">Your Top Match</span>
                   </div>
-                  <p className={`text-5xl font-bold ${topParty.color} mb-2`}>
+                  <p className={`text-6xl font-bold ${topParty.color} mb-2`}>
                     {topParty.name}
                   </p>
-                  <p className="text-3xl font-bold text-gray-900 mb-3">
+                  <p className="text-4xl font-bold text-gray-900 mb-3">
                     {getCandidateName(topPartyIndex)}
                   </p>
                 </div>
 
-                {/* All Parties */}
-                <div className="space-y-3">
-                  <h3 className="font-bold text-lg mb-3">All Parties:</h3>
+                {/* All Parties - grows to fill so bottom aligns with left panel */}
+                <div className="flex flex-col flex-1 min-h-0 space-y-3">
+                  <h3 className="font-bold text-xl mb-4 shrink-0">All Parties:</h3>
                   {parties.map((party, idx) => (
                     <div 
                       key={party.name}
-                      className={`p-4 border-2 rounded ${
+                      className={`p-4 md:p-5 border-2 rounded-2xl transition-colors ${
                         idx === topPartyIndex 
-                          ? 'border-red-600 bg-red-50' 
-                          : 'border-gray-300 bg-gray-50'
+                          ? 'border-red-600 bg-red-50 ring-2 ring-red-600/20' 
+                          : 'border-gray-300 bg-transparent shadow-[0_4px_24px_rgba(0,0,0,0.06)]'
                       }`}
                     >
-                      <div className="flex flex-col">
-                        <p className={`text-lg font-bold ${party.color} mb-1`}>{party.name}</p>
-                        <p className="text-sm font-medium text-gray-900">{getCandidateName(idx)}</p>
+                      <div className="flex flex-row justify-between items-center gap-4">
+                        <p className={`text-xl font-bold ${party.color}`}>{party.name}</p>
+                        <p className="text-base font-medium text-gray-900">{getCandidateName(idx)}</p>
                       </div>
                     </div>
                   ))}
                 </div>
-              </>
-            ) : strategicVoting && loadingProbabilities ? (
-              <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-8 text-center">
-                <p className="text-lg text-gray-700">
+              </div>
+            ) : (
+              <>
+            {loadingProbabilities ? (
+              <div className="bg-transparent border-2 border-gray-300 rounded-2xl p-8 md:p-10 text-center shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
+                <p className="text-xl text-gray-700">
                   Finding your most aligned candidate…
                 </p>
               </div>
-            ) : strategicVoting ? (
-              <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-8 text-center">
-                <p className="text-lg text-gray-700">
-                  Please enter your postal code so we can find your electoral district.
+            ) : !postalCodeValid ? (
+              <div className="bg-transparent border-2 border-gray-300 rounded-2xl p-8 md:p-10 text-center shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
+                <p className="text-xl text-black">
+                  Please enter your postal code so we can find candidates from your electoral district.
                 </p>
               </div>
-            ) : (
-              <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-8 text-center">
-                <p className="text-lg text-gray-700">
+            ) : allZero ? (
+              <div className="bg-transparent border-2 border-gray-300 rounded-2xl p-8 md:p-10 text-center shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
+                <p className="text-xl text-gray-700">
                   Please use at least one slider to go to at least 1
                 </p>
               </div>
+            ) : (
+              <div className="bg-transparent border-2 border-gray-300 rounded-2xl p-8 md:p-10 text-center shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
+                <p className="text-xl text-black">
+                  Please enter your postal code so we can find candidates from your electoral district.
+                </p>
+              </div>
+            )}
+              </>
             )}
           </div>
         </div>
