@@ -10,7 +10,7 @@ const translations = {
     winner: "Winner",
     party1: "Leadership Party",
     party2: "Service Party",
-    tie: "It's a tie!",
+    tie: "Tie",
     votes: "votes",
     totalVotes: "Total votes",
     resetVotes: "Reset Votes",
@@ -20,7 +20,7 @@ const translations = {
     winner: "Gagnant",
     party1: "Parti Leadership",
     party2: "Parti Service",
-    tie: "Égalité!",
+    tie: "Égalité",
     votes: "votes",
     totalVotes: "Total des votes",
     resetVotes: "Réinitialiser",
@@ -163,11 +163,14 @@ const VoteResults = ({ lang }: VoteResultsProps) => {
           </div>
         ) : totalVotes > 0 ? (
           <div 
-            className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-80 lg:h-80 xl:w-96 xl:h-96 rounded-3xl bg-gradient-to-br from-gray-100 to-gray-300 flex items-center justify-center shadow-xl border border-gray-300 mb-8 sm:mb-10 lg:mb-12"
-            style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.2), inset 0 2px 20px rgba(255,255,255,0.8)' }}
+            className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-80 lg:h-80 xl:w-96 xl:h-96 rounded-3xl flex items-center justify-center shadow-xl border border-gray-300 mb-8 sm:mb-10 lg:mb-12 overflow-hidden"
+            style={{ 
+              boxShadow: '0 10px 40px rgba(0,0,0,0.2), inset 0 2px 20px rgba(255,255,255,0.8)',
+              background: 'linear-gradient(to right, #e5e7eb 0%, #e5e7eb 50%, #fde047 50%, #fde047 100%)'
+            }}
           >
             <span 
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-500 text-center px-4 drop-shadow-sm"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 text-center px-4 drop-shadow-sm"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               {t.tie}
