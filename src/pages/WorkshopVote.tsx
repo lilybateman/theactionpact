@@ -74,20 +74,20 @@ const WorkshopVote = ({ lang }: WorkshopVoteProps) => {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-start p-4 pt-32 md:pt-48 pb-8">
-      <div className="flex flex-col items-center justify-center text-center">
+    <div className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center p-4 py-8 sm:py-12 lg:py-0">
+      <div className="flex flex-col items-center justify-center text-center w-full max-w-7xl">
         <h1 
-          className="text-6xl md:text-8xl font-bold mb-12 md:mb-20 text-center text-black"
+          className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold mb-8 sm:mb-12 lg:mb-16 text-center text-black"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {t.title}
         </h1>
         
-        <div className="flex flex-col md:flex-row gap-8 md:gap-20 items-center justify-center">
+        <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 md:gap-12 lg:gap-16 xl:gap-20 items-center justify-center">
           {/* Leadership Party - Shiny Silver */}
           <button
             onClick={() => handlePartyClick('party1')}
-            className={`w-72 h-72 md:w-[28rem] md:h-[28rem] rounded-3xl transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center shadow-xl hover:shadow-2xl border relative overflow-hidden ${
+            className={`w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 xl:w-96 xl:h-96 rounded-3xl transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center shadow-xl hover:shadow-2xl border relative overflow-hidden ${
               selectedParty === 'party1' 
                 ? 'bg-gradient-to-br from-gray-400 via-gray-500 to-gray-600 border-gray-500' 
                 : 'bg-gradient-to-br from-gray-200 via-white via-40% to-gray-400 border-gray-300'
@@ -102,7 +102,7 @@ const WorkshopVote = ({ lang }: WorkshopVoteProps) => {
             {selectedParty === 'party1' && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                 <svg 
-                  className="w-48 h-48 md:w-72 md:h-72 text-white/70 drop-shadow-lg" 
+                  className="w-36 h-36 sm:w-44 sm:h-44 md:w-52 md:h-52 lg:w-60 lg:h-60 xl:w-72 xl:h-72 text-white/70 drop-shadow-lg" 
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -117,7 +117,7 @@ const WorkshopVote = ({ lang }: WorkshopVoteProps) => {
               </div>
             )}
             <span 
-              className={`text-4xl md:text-6xl font-bold text-center px-4 drop-shadow-sm ${
+              className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-center px-4 drop-shadow-sm ${
                 selectedParty === 'party1' ? 'text-white' : 'text-gray-700'
               }`}
               style={{ fontFamily: 'var(--font-display)' }}
@@ -129,7 +129,7 @@ const WorkshopVote = ({ lang }: WorkshopVoteProps) => {
           {/* Service Party - Shiny Gold */}
           <button
             onClick={() => handlePartyClick('party2')}
-            className={`w-72 h-72 md:w-[28rem] md:h-[28rem] rounded-3xl transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center shadow-xl hover:shadow-2xl border relative overflow-hidden ${
+            className={`w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 xl:w-96 xl:h-96 rounded-3xl transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center shadow-xl hover:shadow-2xl border relative overflow-hidden ${
               selectedParty === 'party2' 
                 ? 'bg-gradient-to-br from-yellow-500 via-yellow-600 to-yellow-700 border-yellow-600' 
                 : 'bg-gradient-to-br from-yellow-300 via-yellow-100 via-40% to-yellow-500 border-yellow-400'
@@ -144,7 +144,7 @@ const WorkshopVote = ({ lang }: WorkshopVoteProps) => {
             {selectedParty === 'party2' && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                 <svg 
-                  className="w-48 h-48 md:w-72 md:h-72 text-white/70 drop-shadow-lg" 
+                  className="w-36 h-36 sm:w-44 sm:h-44 md:w-52 md:h-52 lg:w-60 lg:h-60 xl:w-72 xl:h-72 text-white/70 drop-shadow-lg" 
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -159,7 +159,7 @@ const WorkshopVote = ({ lang }: WorkshopVoteProps) => {
               </div>
             )}
             <span 
-              className={`text-4xl md:text-6xl font-bold text-center px-4 drop-shadow-sm ${
+              className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-center px-4 drop-shadow-sm ${
                 selectedParty === 'party2' ? 'text-white' : 'text-yellow-800'
               }`}
               style={{ fontFamily: 'var(--font-display)' }}
@@ -170,15 +170,15 @@ const WorkshopVote = ({ lang }: WorkshopVoteProps) => {
         </div>
 
         {/* Submit button area - always visible */}
-        <div className="mt-12 md:mt-16 h-20 flex items-center justify-center">
+        <div className="mt-8 sm:mt-10 md:mt-12 lg:mt-14 h-16 sm:h-20 flex items-center justify-center">
           {submitted ? (
             <div 
-              className="px-20 py-5 text-3xl bg-black text-white rounded-xl flex items-center gap-4"
+              className="px-12 sm:px-16 md:px-20 py-4 sm:py-5 text-xl sm:text-2xl md:text-3xl bg-black text-white rounded-xl flex items-center gap-3 sm:gap-4"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               {t.submitted}
               <svg 
-                className="w-8 h-8 text-white" 
+                className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
@@ -196,7 +196,7 @@ const WorkshopVote = ({ lang }: WorkshopVoteProps) => {
               <button
                 onClick={handleSubmit}
                 disabled={!selectedParty || submitting}
-                className={`px-20 py-5 text-3xl rounded-xl transition-all duration-200 shadow-lg ${
+                className={`px-12 sm:px-16 md:px-20 py-4 sm:py-5 text-xl sm:text-2xl md:text-3xl rounded-xl transition-all duration-200 shadow-lg ${
                   selectedParty && !submitting
                     ? 'bg-black text-white hover:bg-gray-800 hover:shadow-xl cursor-pointer' 
                     : 'bg-gray-500 text-gray-300 cursor-not-allowed'
@@ -207,7 +207,7 @@ const WorkshopVote = ({ lang }: WorkshopVoteProps) => {
               </button>
               {/* Custom tooltip - shows instantly on hover when disabled */}
               {!selectedParty && !submitting && (
-                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-4 py-2 bg-white text-black text-lg rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap pointer-events-none shadow-lg">
+                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-4 py-2 bg-white text-black text-base sm:text-lg rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap pointer-events-none shadow-lg">
                   {t.selectParty}
                 </div>
               )}

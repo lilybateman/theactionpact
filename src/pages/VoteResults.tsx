@@ -117,8 +117,8 @@ const VoteResults = ({ lang }: VoteResultsProps) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen w-full flex flex-col items-center justify-center p-4">
-        <p className="text-3xl text-gray-500" style={{ fontFamily: 'var(--font-display)' }}>
+      <div className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center p-4">
+        <p className="text-2xl sm:text-3xl lg:text-4xl text-gray-500" style={{ fontFamily: 'var(--font-display)' }}>
           {t.loading}
         </p>
       </div>
@@ -126,11 +126,11 @@ const VoteResults = ({ lang }: VoteResultsProps) => {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-start p-4 pt-16 md:pt-24 pb-8">
-      <div className="flex flex-col items-center justify-center text-center">
+    <div className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center p-4 py-8 sm:py-12 lg:py-0">
+      <div className="flex flex-col items-center justify-center text-center w-full max-w-5xl">
         {/* Winner Title */}
         <h1 
-          className="text-6xl md:text-8xl font-bold mb-12 md:mb-16 text-center text-black"
+          className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold mb-6 sm:mb-8 lg:mb-12 text-center text-black"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {t.winner}
@@ -139,11 +139,11 @@ const VoteResults = ({ lang }: VoteResultsProps) => {
         {/* Winner Party Box - only show if there's a winner */}
         {winner === 'party1' ? (
           <div 
-            className="w-72 h-72 md:w-[28rem] md:h-[28rem] rounded-3xl bg-gradient-to-br from-gray-200 via-white via-40% to-gray-400 flex items-center justify-center shadow-xl border border-gray-300 mb-12 md:mb-16"
+            className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-80 lg:h-80 xl:w-96 xl:h-96 rounded-3xl bg-gradient-to-br from-gray-200 via-white via-40% to-gray-400 flex items-center justify-center shadow-xl border border-gray-300 mb-8 sm:mb-10 lg:mb-12"
             style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.2), inset 0 2px 20px rgba(255,255,255,0.8)' }}
           >
             <span 
-              className="text-4xl md:text-6xl font-bold text-gray-700 text-center px-4 drop-shadow-sm"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-700 text-center px-4 drop-shadow-sm"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               {t.party1}
@@ -151,11 +151,11 @@ const VoteResults = ({ lang }: VoteResultsProps) => {
           </div>
         ) : winner === 'party2' ? (
           <div 
-            className="w-72 h-72 md:w-[28rem] md:h-[28rem] rounded-3xl bg-gradient-to-br from-yellow-300 via-yellow-100 via-40% to-yellow-500 flex items-center justify-center shadow-xl border border-yellow-400 mb-12 md:mb-16"
+            className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-80 lg:h-80 xl:w-96 xl:h-96 rounded-3xl bg-gradient-to-br from-yellow-300 via-yellow-100 via-40% to-yellow-500 flex items-center justify-center shadow-xl border border-yellow-400 mb-8 sm:mb-10 lg:mb-12"
             style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.2), inset 0 2px 20px rgba(255,255,255,0.8)' }}
           >
             <span 
-              className="text-4xl md:text-6xl font-bold text-yellow-800 text-center px-4 drop-shadow-sm"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-yellow-800 text-center px-4 drop-shadow-sm"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               {lang === 'en' ? <>Service<br />Party</> : <>Parti<br />Service</>}
@@ -163,11 +163,11 @@ const VoteResults = ({ lang }: VoteResultsProps) => {
           </div>
         ) : totalVotes > 0 ? (
           <div 
-            className="w-72 h-72 md:w-[28rem] md:h-[28rem] rounded-3xl bg-gradient-to-br from-gray-100 to-gray-300 flex items-center justify-center shadow-xl border border-gray-300 mb-12 md:mb-16"
+            className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-80 lg:h-80 xl:w-96 xl:h-96 rounded-3xl bg-gradient-to-br from-gray-100 to-gray-300 flex items-center justify-center shadow-xl border border-gray-300 mb-8 sm:mb-10 lg:mb-12"
             style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.2), inset 0 2px 20px rgba(255,255,255,0.8)' }}
           >
             <span 
-              className="text-4xl md:text-5xl font-bold text-gray-500 text-center px-4 drop-shadow-sm"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-500 text-center px-4 drop-shadow-sm"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               {t.tie}
@@ -176,24 +176,24 @@ const VoteResults = ({ lang }: VoteResultsProps) => {
         ) : null}
 
         {/* Vote Graph */}
-        <div className="w-full max-w-2xl mb-12 md:mb-16">
+        <div className="w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mb-8 sm:mb-10 lg:mb-12 px-4">
           {/* Leadership Party Bar */}
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-2">
+          <div className="mb-4 sm:mb-6">
+            <div className="flex justify-between items-center mb-2 gap-4">
               <span 
-                className="text-xl md:text-2xl font-bold text-gray-700"
+                className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-700 whitespace-nowrap"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {t.party1}
               </span>
               <span 
-                className="text-xl md:text-2xl font-bold text-gray-700"
+                className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-700 whitespace-nowrap"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {votes.party1} {t.votes} ({party1Percent}%)
               </span>
             </div>
-            <div className="w-full h-10 md:h-12 bg-gray-200 rounded-full overflow-hidden">
+            <div className="w-full h-8 sm:h-10 md:h-12 lg:h-14 bg-gray-200 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-gradient-to-r from-gray-400 via-gray-300 to-gray-500 rounded-full transition-all duration-500"
                 style={{ width: `${party1Percent}%` }}
@@ -203,21 +203,21 @@ const VoteResults = ({ lang }: VoteResultsProps) => {
 
           {/* Service Party Bar */}
           <div>
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex justify-between items-center mb-2 gap-4">
               <span 
-                className="text-xl md:text-2xl font-bold text-yellow-700"
+                className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-yellow-700 whitespace-nowrap"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {t.party2}
               </span>
               <span 
-                className="text-xl md:text-2xl font-bold text-yellow-700"
+                className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-yellow-700 whitespace-nowrap"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {votes.party2} {t.votes} ({party2Percent}%)
               </span>
             </div>
-            <div className="w-full h-10 md:h-12 bg-gray-200 rounded-full overflow-hidden">
+            <div className="w-full h-8 sm:h-10 md:h-12 lg:h-14 bg-gray-200 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full transition-all duration-500"
                 style={{ width: `${party2Percent}%` }}
@@ -227,7 +227,7 @@ const VoteResults = ({ lang }: VoteResultsProps) => {
 
           {/* Total votes */}
           <p 
-            className="text-xl md:text-2xl text-muted-foreground mt-6 text-center"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground mt-4 sm:mt-6 text-center"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             {t.totalVotes}: {totalVotes}
@@ -237,7 +237,7 @@ const VoteResults = ({ lang }: VoteResultsProps) => {
         {/* Reset button */}
         <button
           onClick={handleReset}
-          className="px-12 py-4 text-xl bg-black text-white rounded-xl hover:bg-gray-800 transition-all duration-200 shadow-lg"
+          className="px-8 sm:px-10 md:px-12 py-3 sm:py-4 text-base sm:text-lg md:text-xl bg-black text-white rounded-xl hover:bg-gray-800 transition-all duration-200 shadow-lg"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {t.resetVotes}
