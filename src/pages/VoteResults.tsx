@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 
 interface VoteResultsProps {
-  lang: 'en' | 'fr';
+  lang: 'en' | 'fr' | 'bilingual';
 }
 
 const translations = {
@@ -18,13 +18,23 @@ const translations = {
   },
   fr: {
     winner: "Gagnant",
-    party1: "Parti Leadership",
-    party2: "Parti Service",
+    party1: "Parti du Leadership",
+    party2: "Parti du Service",
     tie: "Égalité",
     votes: "votes",
     totalVotes: "Total des votes",
     resetVotes: "Réinitialiser",
     loading: "Chargement des résultats...",
+  },
+  bilingual: {
+    winner: "Winner / Gagnant",
+    party1: "Parti du Leadership Party",
+    party2: "Parti du Service Party",
+    tie: "Tie / Égalité",
+    votes: "votes",
+    totalVotes: "Total votes / Total des votes",
+    resetVotes: "Reset Votes / Réinitialiser",
+    loading: "Loading results... / Chargement des résultats...",
   },
 };
 
@@ -33,7 +43,7 @@ const VoteResults = ({ lang }: VoteResultsProps) => {
   const [loading, setLoading] = useState(true);
 
   const t = translations[lang];
-  const tableName = lang === 'en' ? 'WorkshopVotesEN' : 'WorkshopVotesFR';
+  const tableName = lang === 'en' ? 'WorkshopVotesEN' : lang === 'fr' ? 'WorkshopVotesFR' : 'WorkshopVotesBilingual';
 
   // Fetch votes from Supabase
   const fetchVotes = useCallback(async () => {
@@ -98,14 +108,29 @@ const VoteResults = ({ lang }: VoteResultsProps) => {
 
   const handleReset = async () => {
     try {
-      // Delete all votes from Supabase
-      const { error } = await supabase
+      // Fetch all vote ids first (works for both bigint and uuid primary keys)
+      const { data: rows, error: fetchError } = await supabase
+        .from(tableName)
+        .select('id');
+
+      if (fetchError) {
+        console.error('Error fetching votes for reset:', fetchError);
+        return;
+      }
+
+      if (!rows?.length) {
+        setVotes({ party1: 0, party2: 0 });
+        return;
+      }
+
+      const ids = rows.map((r) => r.id);
+      const { error: deleteError } = await supabase
         .from(tableName)
         .delete()
-        .gte('id', 0); // Delete all rows
+        .in('id', ids);
 
-      if (error) {
-        console.error('Error resetting votes:', error);
+      if (deleteError) {
+        console.error('Error resetting votes:', deleteError);
         return;
       }
 
@@ -126,11 +151,11 @@ const VoteResults = ({ lang }: VoteResultsProps) => {
   }
 
   return (
-    <div className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center p-4 py-8 sm:py-12 lg:py-0">
+    <div className="min-h-screen w-full flex flex-col items-center justify-start overflow-y-auto p-4 pt-8 sm:pt-12 md:pt-16 pb-12">
       <div className="flex flex-col items-center justify-center text-center w-full max-w-5xl">
-        {/* Winner Title */}
+        {/* Winner Title - always visible with top padding */}
         <h1 
-          className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold mb-6 sm:mb-8 lg:mb-12 text-center text-black"
+          className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold mb-6 sm:mb-8 lg:mb-12 text-center text-black shrink-0"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {t.winner}
@@ -158,7 +183,7 @@ const VoteResults = ({ lang }: VoteResultsProps) => {
               className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-yellow-800 text-center px-4 drop-shadow-sm"
               style={{ fontFamily: 'var(--font-display)' }}
             >
-              {lang === 'en' ? <>Service<br />Party</> : <>Parti<br />Service</>}
+              {lang === 'en' ? <>Service<br />Party</> : lang === 'fr' ? <>Parti du<br />Service</> : <>Parti du<br />Service Party</>}
             </span>
           </div>
         ) : totalVotes > 0 ? (

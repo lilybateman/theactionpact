@@ -12,8 +12,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/beta" element={<ActiVote />} />
+        <Route path="/workshopvote" element={<WorkshopVote lang="bilingual" />} />
         <Route path="/workshopvote/en" element={<WorkshopVote lang="en" />} />
         <Route path="/workshopvote/fr" element={<WorkshopVote lang="fr" />} />
+        <Route path="/voteresults" element={<VoteResults lang="bilingual" />} />
         <Route path="/voteresults/en" element={<VoteResults lang="en" />} />
         <Route path="/voteresults/fr" element={<VoteResults lang="fr" />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

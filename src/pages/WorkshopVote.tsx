@@ -2,7 +2,7 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 interface WorkshopVoteProps {
-  lang: 'en' | 'fr';
+  lang: 'en' | 'fr' | 'bilingual';
 }
 
 const translations = {
@@ -17,12 +17,21 @@ const translations = {
   },
   fr: {
     title: "Votez",
-    party1: "Parti Leadership",
-    party2: "Parti Service",
+    party1: "Parti du Leadership",
+    party2: "Parti du Service",
     submit: "Soumettre",
     submitting: "Soumission...",
     submitted: "Soumis",
     selectParty: "Sélectionnez un parti",
+  },
+  bilingual: {
+    title: "Cast Your Vote / Votez",
+    party1: "Parti du Leadership Party",
+    party2: "Parti du Service Party",
+    submit: "Submit / Soumettre",
+    submitting: "Submitting... / Soumission...",
+    submitted: "Submitted / Soumis",
+    selectParty: "Select a party / Sélectionnez un parti",
   },
 };
 
@@ -32,7 +41,7 @@ const WorkshopVote = ({ lang }: WorkshopVoteProps) => {
   const [submitting, setSubmitting] = useState(false);
 
   const t = translations[lang];
-  const tableName = lang === 'en' ? 'WorkshopVotesEN' : 'WorkshopVotesFR';
+  const tableName = lang === 'en' ? 'WorkshopVotesEN' : lang === 'fr' ? 'WorkshopVotesFR' : 'WorkshopVotesBilingual';
 
   const handlePartyClick = (party: string) => {
     // Don't allow selection while showing submitted state or submitting
@@ -164,7 +173,7 @@ const WorkshopVote = ({ lang }: WorkshopVoteProps) => {
               }`}
               style={{ fontFamily: 'var(--font-display)' }}
             >
-              {lang === 'en' ? <>Service<br />Party</> : <>Parti<br />Service</>}
+              {lang === 'en' ? <>Service<br />Party</> : lang === 'fr' ? <>Parti du<br />Service</> : <>Parti du<br />Service Party</>}
             </span>
           </button>
         </div>
