@@ -2,7 +2,77 @@ import { useState, useEffect } from "react";
 import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/lib/supabase";
 
+const translations = {
+  en: {
+    scoreHeading: "Score how important each issue is to you",
+    scaleLabel: "0 = not important, 5 = very important",
+    climate: "Climate",
+    housing: "Housing",
+    jobs: "Jobs",
+    healthcare: "Healthcare",
+    postalCode: "Postal Code",
+    required: "Required",
+    loading: "Loading...",
+    notFound: "Not found",
+    matchBasedOnScores: "Match based on scores",
+    strategic: "Strategic",
+    disclaimer: "Disclaimer: This tool uses historical data and is currently in beta testing.",
+    howSliderWorks: "How the slider works",
+    sliderBullet1: "When slider is at 0: Recommendations are based only on alignment with your priorities (not strategic).",
+    sliderBullet2: "When slider is above 0: We use two lists — parties by alignment (your priorities) and parties by win probability in your district.",
+    sliderBullet3: "If your top-aligned party is 1st or 2nd by probability, we recommend them.",
+    sliderBullet4: "Otherwise: Strategy applies. We exclude the least-aligned party.",
+    sliderBullet5: "The slider controls how much value deviation is allowed.",
+    sliderBullet6: "From eligible parties, we pick the one with the highest weighted score (alignment + probability).",
+    districtOf: "District of",
+    yourTopMatch: "Your Top Match",
+    allParties: "All Parties:",
+    findingCandidate: "Finding your most aligned candidate…",
+    enterPostalCode: "Please enter your postal code so we can find candidates from your electoral district.",
+    useOneSlider: "Please use at least one slider to go to at least 1",
+    ariaInfo: "How the strategic voting slider works",
+    close: "Close",
+    partyNames: ["Progressive Conservative", "NDP", "Liberal", "Green"],
+  },
+  fr: {
+    scoreHeading: "Indiquez l'importance de chaque enjeu pour vous",
+    scaleLabel: "0 = pas important, 5 = très important",
+    climate: "Climat",
+    housing: "Logement",
+    jobs: "Emplois",
+    healthcare: "Santé",
+    postalCode: "Code postal",
+    required: "Obligatoire",
+    loading: "Chargement…",
+    notFound: "Introuvable",
+    matchBasedOnScores: "Correspondance selon les scores",
+    strategic: "Stratégique",
+    disclaimer: "Avertissement : Cet outil utilise des données historiques et est en phase de test.",
+    howSliderWorks: "Comment fonctionne le curseur",
+    sliderBullet1: "À 0 : Les recommandations se basent uniquement sur l'alignement avec vos priorités (pas stratégique).",
+    sliderBullet2: "Au-dessus de 0 : Nous utilisons deux listes — les partis par alignement (vos priorités) et les partis par probabilité de victoire dans votre circonscription.",
+    sliderBullet3: "Si votre parti le plus aligné est 1er ou 2e en probabilité, nous le recommandons.",
+    sliderBullet4: "Sinon : La stratégie s'applique. Nous excluons le parti le moins aligné.",
+    sliderBullet5: "Le curseur contrôle la déviation de valeur autorisée.",
+    sliderBullet6: "Parmi les partis admissibles, nous choisissons celui avec le score pondéré le plus élevé (alignement + probabilité).",
+    districtOf: "Circonscription de",
+    yourTopMatch: "Votre meilleur choix",
+    allParties: "Tous les partis :",
+    findingCandidate: "Recherche de votre candidat le plus aligné…",
+    enterPostalCode: "Veuillez entrer votre code postal pour trouver les candidats de votre circonscription.",
+    useOneSlider: "Veuillez utiliser au moins un curseur (au moins 1).",
+    ariaInfo: "Comment fonctionne le curseur de vote stratégique",
+    close: "Fermer",
+    partyNames: ["Parti progressiste-conservateur", "NPD", "Libéral", "Parti vert"],
+  },
+} as const;
+
+type Lang = keyof typeof translations;
+
 const ActiVote = () => {
+  const [lang, setLang] = useState<Lang>("en");
+  const t = translations[lang];
+
   // Override the zoom and overflow settings for this page
   useEffect(() => {
     document.body.style.overflow = 'auto';
@@ -64,17 +134,18 @@ const ActiVote = () => {
     { name: "Green", candidateName: "Elizabeth May", color: "text-green-600", partyCode: "GPO" },
   ];
 
-  // Helper function to get candidate name for a party (uses real name if available, otherwise fallback)
+  // When we have district data, only show parties that have a candidate in the dataset (no fallback)
+  const hasDistrictCandidateData = Boolean(districtName && !loadingProbabilities);
+  const partyEntriesWithCandidates = hasDistrictCandidateData
+    ? parties.map((p, i) => ({ party: p, index: i })).filter(({ party }) => candidateNames[party.partyCode])
+    : parties.map((p, i) => ({ party: p, index: i }));
+  const eligibleIndicesSet = new Set(partyEntriesWithCandidates.map((e) => e.index));
+
+  // Helper function to get candidate name for a party (uses real name if available, otherwise fallback when no district data)
   const getCandidateName = (partyIndex: number): string => {
     const party = parties[partyIndex];
     if (!party) return "Unknown";
-    
-    // If we have candidate names from Supabase, use the real name
-    if (candidateNames[party.partyCode]) {
-      return candidateNames[party.partyCode];
-    }
-    
-    // Otherwise, use the default hardcoded name
+    if (candidateNames[party.partyCode]) return candidateNames[party.partyCode];
     return party.candidateName;
   };
 
@@ -867,31 +938,33 @@ const ActiVote = () => {
   const totalScore = scores.reduce((sum, score) => sum + score, 0);
   const normalizedScores = totalScore > 0 ? scores.map(score => (score / totalScore) * 100) : [0, 0, 0, 0];
   
-  // Prepare data for strategic voting logic
-  // Most closely aligned parties (sorted by rubric score) - order: NDP, Green, Liberal, Conservative
-  const alignedParties = scores.map((score, index) => ({
+  // Prepare data for strategic voting logic (only include parties that have a candidate in this district when applicable)
+  const alignedPartiesAll = scores.map((score, index) => ({
     partyIndex: index,
     partyName: parties[index].name,
     score: normalizedScores[index],
-    rubricScore: score, // Original score before normalization
+    rubricScore: score,
   })).sort((a, b) => b.rubricScore - a.rubricScore);
+  const alignedParties = alignedPartiesAll.filter((p) => eligibleIndicesSet.has(p.partyIndex));
 
-  // Most likely to win parties (sorted by probability from Supabase) - order: Conservative, Liberal, NDP, Green
-  const strategicParties = districtProbabilities ? [
-    { partyIndex: 0, partyName: 'Progressive Conservative', probability: districtProbabilities.PCP ?? 0 }, // PCP
-    { partyIndex: 1, partyName: 'NDP', probability: districtProbabilities.NDP ?? 0 }, // NDP
-    { partyIndex: 2, partyName: 'Liberal', probability: districtProbabilities.LIB ?? 0 }, // LIB
-    { partyIndex: 3, partyName: 'Green', probability: districtProbabilities.GPO ?? 0 }, // GPO
+  const strategicPartiesAll = districtProbabilities ? [
+    { partyIndex: 0, partyName: 'Progressive Conservative', probability: districtProbabilities.PCP ?? 0 },
+    { partyIndex: 1, partyName: 'NDP', probability: districtProbabilities.NDP ?? 0 },
+    { partyIndex: 2, partyName: 'Liberal', probability: districtProbabilities.LIB ?? 0 },
+    { partyIndex: 3, partyName: 'Green', probability: districtProbabilities.GPO ?? 0 },
   ].sort((a, b) => b.probability - a.probability) : [];
+  const strategicParties = strategicPartiesAll.filter((p) => eligibleIndicesSet.has(p.partyIndex));
 
-  // Strategic voting logic - always use slider algorithm
+  // Strategic voting logic - always use slider algorithm (only among parties with candidates when district data exists)
   let topPartyIndex: number;
-  let topParty: { name: string; candidateName: string; color: string };
+  let topParty: { name: string; candidateName: string; color: string; partyCode: string };
   
   const sliderValue = strategicSlider[0]; // Get slider value (0-1)
   
-  // If we have district probabilities and slider is above 0, use strategic algorithm
-  if (strategicParties.length > 0 && alignedParties.length > 0 && sliderValue > 0) {
+  if (partyEntriesWithCandidates.length === 0) {
+    topPartyIndex = -1;
+    topParty = parties[0];
+  } else if (strategicParties.length > 0 && alignedParties.length > 0 && sliderValue > 0) {
     // Slider Algorithm Implementation
     // Find the party with the highest alignment score (topParty)
     const topAlignedParty = alignedParties[0];
@@ -968,24 +1041,37 @@ const ActiVote = () => {
       }
     }
   } else {
-    // When slider is at 0 or no district data: use alignment scores only (not strategic)
-    const maxScore = totalScore > 0 ? Math.max(...normalizedScores) : 0;
-    topPartyIndex = totalScore > 0 ? normalizedScores.indexOf(maxScore) : 0;
+    // When slider is at 0 or no district data: use alignment scores only (among eligible parties)
+    if (partyEntriesWithCandidates.length > 0) {
+      const bestAmongEligible = partyEntriesWithCandidates.reduce((best, entry) =>
+        normalizedScores[entry.index] >= normalizedScores[best.index] ? entry : best
+      );
+      topPartyIndex = bestAmongEligible.index;
+    } else {
+      topPartyIndex = totalScore > 0 ? normalizedScores.indexOf(Math.max(...normalizedScores)) : 0;
+    }
     topParty = parties[topPartyIndex];
   }
 
   return (
     <>
-      <header className="container py-4 md:py-6 flex items-center justify-end">
-        <div className="flex items-center gap-4 w-full">
-          <a href="/" className="flex items-center">
-            <img
-              src="/images/logo.png"
-              alt="The Action Pact Logo"
-              className="h-24 md:h-32 w-auto object-contain"
-            />
-          </a>
-        </div>
+      <header className="container py-4 md:py-6 flex items-center justify-between w-full">
+        <a href="/" className="flex items-center">
+          <img
+            src="/images/logo.png"
+            alt="The Action Pact Logo"
+            className="h-24 md:h-32 w-auto object-contain"
+          />
+        </a>
+        <button
+          type="button"
+          onClick={() => setLang(lang === "en" ? "fr" : "en")}
+          className="px-4 py-2 text-lg font-medium border-2 border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-colors"
+          style={{ fontFamily: 'var(--font-display)' }}
+          aria-label={lang === "en" ? "Switch to French" : "Passer en anglais"}
+        >
+          {lang === "en" ? "FR" : "EN"}
+        </button>
       </header>
       <main className="container py-10 md:py-14 overflow-y-auto max-w-7xl mx-auto px-4 sm:px-6">
         <h1 className="text-6xl md:text-7xl font-bold mb-10 md:mb-14 text-center text-primary tracking-tight">ActiVote</h1>
@@ -994,14 +1080,14 @@ const ActiVote = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-stretch">
           {/* Left Column - Sliders in a raised panel */}
           <div className="lg:col-span-6 lg:self-start">
-            <div className="relative rounded-3xl border-2 border-gray-300 bg-transparent pt-4 px-6 pb-4 md:pt-5 md:px-8 md:pb-5 shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-2">Score how important each issue is to you</h2>
-              <p className="text-lg text-black mb-8">0 = not important, 5 = very important</p>
+            <div className="relative rounded-3xl border-2 border-gray-300 bg-transparent pt-4 pb-4 pl-6 pr-6 md:pt-5 md:pb-5 md:pl-8 md:pr-8 shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
+              <h2 className={`font-bold mb-2 ${lang === "fr" ? "text-[1.06rem] sm:text-[1.2rem] md:text-[1.375rem]" : "text-xl sm:text-2xl md:text-[1.65rem]"}`}>{t.scoreHeading}</h2>
+              <p className="text-lg text-black mb-8">{t.scaleLabel}</p>
               <div className="space-y-8">
               {/* Climate Slider */}
               <div>
                 <div className="flex justify-between items-center mb-3">
-                  <label className="text-xl font-medium">Climate</label>
+                  <label className="text-xl font-medium">{t.climate}</label>
                   <span className="text-xl font-bold text-primary">{climate[0]}/5</span>
                 </div>
                 <Slider
@@ -1017,7 +1103,7 @@ const ActiVote = () => {
               {/* Housing Slider */}
               <div>
                 <div className="flex justify-between items-center mb-3">
-                  <label className="text-xl font-medium">Housing</label>
+                  <label className="text-xl font-medium">{t.housing}</label>
                   <span className="text-xl font-bold text-primary">{housing[0]}/5</span>
                 </div>
                 <Slider
@@ -1033,7 +1119,7 @@ const ActiVote = () => {
               {/* Jobs Slider */}
               <div>
                 <div className="flex justify-between items-center mb-3">
-                  <label className="text-xl font-medium">Jobs</label>
+                  <label className="text-xl font-medium">{t.jobs}</label>
                   <span className="text-xl font-bold text-primary">{jobs[0]}/5</span>
                 </div>
                 <Slider
@@ -1049,7 +1135,7 @@ const ActiVote = () => {
               {/* Healthcare Slider */}
               <div>
                 <div className="flex justify-between items-center mb-3">
-                  <label className="text-xl font-medium">Healthcare</label>
+                  <label className="text-xl font-medium">{t.healthcare}</label>
                   <span className="text-xl font-bold text-primary">{healthcare[0]}/5</span>
                 </div>
                 <Slider
@@ -1064,13 +1150,13 @@ const ActiVote = () => {
 
               {/* Postal Code Input - Always Required */}
               <div className="flex items-center gap-3 mt-4 pt-2">
-                <label className="text-xl font-medium">Postal Code</label>
+                <label className="text-xl font-medium">{t.postalCode}</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
                     value={postalCode}
                     onChange={(e) => setPostalCode(e.target.value)}
-                    placeholder="Required"
+                    placeholder={t.required}
                     className={`px-3 text-base border-2 border-foreground rounded-md w-28 h-10 self-center focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 transition-all ${
                       loadingProbabilities ? 'opacity-50' : ''
                     }`}
@@ -1079,25 +1165,25 @@ const ActiVote = () => {
                     required
                   />
                   {loadingProbabilities && (
-                    <span className="text-base text-gray-500">Loading...</span>
+                    <span className="text-base text-gray-500">{t.loading}</span>
                   )}
                   {!loadingProbabilities && postalCodeValid && districtProbabilities === null && postalCode.length > 0 && (
-                    <span className="text-base text-red-600">Not found</span>
+                    <span className="text-base text-red-600">{t.notFound}</span>
                   )}
                 </div>
               </div>
 
               {/* Strategic Voting Slider - Always shown */}
               <div className="mt-6">
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-lg font-medium text-primary">Match based on scores</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-lg font-medium text-primary">Strategic</span>
+                <div className={`flex justify-between items-center mb-3 ${lang === "fr" ? "flex-nowrap gap-4" : ""}`}>
+                  <span className={`text-lg font-medium text-primary ${lang === "fr" ? "whitespace-nowrap" : ""}`}>{t.matchBasedOnScores}</span>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="text-lg font-medium text-primary">{t.strategic}</span>
                     <button
                       type="button"
                       onClick={() => setInfoPopoverOpen(true)}
                       className="inline-flex h-6 w-6 items-center justify-center rounded-full border-2 border-primary bg-background text-primary hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
-                      aria-label="How the strategic voting slider works"
+                      aria-label={t.ariaInfo}
                     >
                       <span className="text-base font-semibold">i</span>
                     </button>
@@ -1114,33 +1200,33 @@ const ActiVote = () => {
               </div>
               
               {/* Disclaimer */}
-              <p className="text-base font-medium text-primary mb-0 pt-0 -mt-3 sm:whitespace-nowrap">
-                Disclaimer: This tool uses historical data and is currently in beta testing.
+              <p className={`font-medium text-primary mb-0 pt-0 -mt-3 text-center ${lang === "fr" ? "text-[15px] whitespace-nowrap" : "text-base sm:whitespace-nowrap"}`}>
+                {t.disclaimer}
               </p>
               </div>
 
               {/* Info overlay - covers whole scoring box when i is clicked */}
               {infoPopoverOpen && (
-                <div className="absolute inset-0 z-10 rounded-3xl bg-background border-2 border-gray-300 p-6 overflow-auto flex flex-col shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
+                <div className="absolute inset-0 z-10 rounded-3xl bg-background border-2 border-gray-300 overflow-auto flex flex-col shadow-[0_4px_24px_rgba(0,0,0,0.06)] pl-6 pr-6 pt-6 pb-6 md:pl-8 md:pr-8 md:pt-6 md:pb-6">
                   <button
                     type="button"
                     onClick={() => setInfoPopoverOpen(false)}
                     className="self-end mb-4 p-1 text-primary hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-opacity"
-                    aria-label="Close"
+                    aria-label={t.close}
                   >
                     <span className="text-4xl font-medium leading-none">×</span>
                   </button>
                   <div className="space-y-5 flex-1" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
                     <p className="text-2xl font-semibold text-gray-900">
-                      How the slider works
+                      {t.howSliderWorks}
                     </p>
-                    <ul className="list-disc list-inside space-y-3 text-lg text-gray-700">
-                      <li>When slider is at 0: Recommendations are based only on alignment with your priorities (not strategic).</li>
-                      <li>When slider is above 0: We use two lists — parties by alignment (your priorities) and parties by win probability in your district.</li>
-                      <li>If your top-aligned party is 1st or 2nd by probability, we recommend them.</li>
-                      <li>Otherwise: Strategy applies. We exclude the least-aligned party.</li>
-                      <li>The slider controls how much value deviation is allowed.</li>
-                      <li>From eligible parties, we pick the one with the highest weighted score (alignment + probability).</li>
+                    <ul className="list-disc list-outside space-y-3 text-lg text-gray-700 ml-5 pl-0">
+                      <li className="pl-1">{t.sliderBullet1}</li>
+                      <li className="pl-1">{t.sliderBullet2}</li>
+                      <li className="pl-1">{t.sliderBullet3}</li>
+                      <li className="pl-1">{t.sliderBullet4}</li>
+                      <li className="pl-1">{t.sliderBullet5}</li>
+                      <li className="pl-1">{t.sliderBullet6}</li>
                     </ul>
                   </div>
                 </div>
@@ -1152,68 +1238,78 @@ const ActiVote = () => {
           <div className="lg:col-span-6 lg:sticky lg:top-8 h-full flex flex-col min-h-0">
             {districtName && (
               <p className="text-center text-lg md:text-xl text-black mb-0 -mt-2">
-                District of <span className="font-semibold">{districtName}</span>
+                {t.districtOf} <span className="font-semibold">{districtName}</span>
               </p>
             )}
             {/* Show results if postal code is valid and district probabilities are loaded and sliders are used */}
             {shouldShowResults ? (
               <div className="flex flex-col flex-1 min-h-0">
-                <div className="relative bg-gradient-to-br from-red-50 to-red-100 border-4 border-red-600 rounded-3xl p-8 md:p-10 shadow-[0_8px_40px_rgba(0,0,0,0.08)] mb-8 shrink-0">
-                  <div className="absolute top-8 right-6 -rotate-6 border-2 border-red-600 bg-white/90 px-4 py-2 rounded shadow-sm" style={{ fontFamily: 'var(--font-display)' }}>
-                    <span className="text-2xl font-bold text-red-600">Your Top Match</span>
+                {partyEntriesWithCandidates.length === 0 ? (
+                  <div className="bg-transparent border-2 border-gray-300 rounded-2xl pl-8 pr-8 pt-8 pb-8 md:pl-10 md:pr-10 md:pt-10 md:pb-10 text-center shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
+                    <p className="text-xl text-gray-700">
+                      {lang === "fr" ? "Aucun candidat dans notre base de données pour cette circonscription." : "No candidates in our dataset for this district."}
+                    </p>
                   </div>
-                  <p className={`text-6xl font-bold ${topParty.color} mb-2`}>
-                    {topParty.name}
-                  </p>
-                  <p className="text-4xl font-bold text-gray-900 mb-3">
-                    {getCandidateName(topPartyIndex)}
-                  </p>
-                </div>
-
-                {/* All Parties - grows to fill so bottom aligns with left panel */}
-                <div className="flex flex-col flex-1 min-h-0 space-y-3">
-                  <h3 className="font-bold text-xl mb-4 shrink-0">All Parties:</h3>
-                  {parties.map((party, idx) => (
-                    <div 
-                      key={party.name}
-                      className={`p-4 md:p-5 border-2 rounded-2xl transition-colors ${
-                        idx === topPartyIndex 
-                          ? 'border-red-600 bg-red-50 ring-2 ring-red-600/20' 
-                          : 'border-gray-300 bg-transparent shadow-[0_4px_24px_rgba(0,0,0,0.06)]'
-                      }`}
-                    >
-                      <div className="flex flex-row justify-between items-center gap-4">
-                        <p className={`text-xl font-bold ${party.color}`}>{party.name}</p>
-                        <p className="text-base font-medium text-gray-900">{getCandidateName(idx)}</p>
+                ) : (
+                  <>
+                    <div className="relative bg-gradient-to-br from-red-50 to-red-100 border-4 border-red-600 rounded-3xl pl-8 pr-8 pt-8 pb-8 md:pl-10 md:pr-10 md:pt-10 md:pb-10 shadow-[0_8px_40px_rgba(0,0,0,0.08)] mb-8 shrink-0">
+                      <div className={`absolute right-6 -rotate-6 border-2 border-red-600 bg-white/90 px-4 py-2 rounded shadow-sm ${lang === "fr" ? "top-24" : "top-8"}`} style={{ fontFamily: 'var(--font-display)' }}>
+                        <span className="text-2xl font-bold text-red-600">{t.yourTopMatch}</span>
                       </div>
+                      <p className={`text-6xl font-bold ${topParty.color} mb-2`}>
+                        {t.partyNames[topPartyIndex]}
+                      </p>
+                      <p className="text-4xl font-bold text-gray-900 mb-3">
+                        {getCandidateName(topPartyIndex)}
+                      </p>
                     </div>
-                  ))}
-                </div>
+
+                    {/* All Parties - only parties with a candidate in this district when district data exists */}
+                    <div className="flex flex-col flex-1 min-h-0 space-y-3">
+                      <h3 className="font-bold text-xl mb-4 shrink-0">{t.allParties}</h3>
+                      {partyEntriesWithCandidates.map(({ party, index: idx }) => (
+                        <div 
+                          key={party.name}
+                          className={`pl-5 pr-5 pt-4 pb-4 md:pl-6 md:pr-6 md:pt-5 md:pb-5 border-2 rounded-2xl transition-colors ${
+                            idx === topPartyIndex 
+                              ? 'border-red-600 bg-red-50 ring-2 ring-red-600/20' 
+                              : 'border-gray-300 bg-transparent shadow-[0_4px_24px_rgba(0,0,0,0.06)]'
+                          }`}
+                        >
+                          <div className="flex flex-row justify-between items-center gap-4">
+                            <p className={`text-xl font-bold ${party.color}`}>{t.partyNames[idx]}</p>
+                            <p className="text-base font-medium text-gray-900">{getCandidateName(idx)}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             ) : (
               <>
             {loadingProbabilities ? (
-              <div className="bg-transparent border-2 border-gray-300 rounded-2xl p-8 md:p-10 text-center shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
+              <div className="bg-transparent border-2 border-gray-300 rounded-2xl pl-8 pr-8 pt-8 pb-8 md:pl-10 md:pr-10 md:pt-10 md:pb-10 text-center shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
                 <p className="text-xl text-gray-700">
-                  Finding your most aligned candidate…
+                  {t.findingCandidate}
                 </p>
               </div>
             ) : !postalCodeValid ? (
-              <div className="bg-transparent border-2 border-gray-300 rounded-2xl p-8 md:p-10 text-center shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
+              <div className="bg-transparent border-2 border-gray-300 rounded-2xl pl-8 pr-8 pt-8 pb-8 md:pl-10 md:pr-10 md:pt-10 md:pb-10 text-center shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
                 <p className="text-xl text-black">
-                  Please enter your postal code so we can find candidates from your electoral district.
+                  {t.enterPostalCode}
                 </p>
               </div>
             ) : allZero ? (
-              <div className="bg-transparent border-2 border-gray-300 rounded-2xl p-8 md:p-10 text-center shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
+              <div className="bg-transparent border-2 border-gray-300 rounded-2xl pl-8 pr-8 pt-8 pb-8 md:pl-10 md:pr-10 md:pt-10 md:pb-10 text-center shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
                 <p className="text-xl text-gray-700">
-                  Please use at least one slider to go to at least 1
+                  {t.useOneSlider}
                 </p>
               </div>
             ) : (
-              <div className="bg-transparent border-2 border-gray-300 rounded-2xl p-8 md:p-10 text-center shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
+              <div className="bg-transparent border-2 border-gray-300 rounded-2xl pl-8 pr-8 pt-8 pb-8 md:pl-10 md:pr-10 md:pt-10 md:pb-10 text-center shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
                 <p className="text-xl text-black">
-                  Please enter your postal code so we can find candidates from your electoral district.
+                  {t.enterPostalCode}
                 </p>
               </div>
             )}
