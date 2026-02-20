@@ -16,7 +16,7 @@ const translations = {
     notFound: "Not found",
     matchBasedOnScores: "Match based on scores",
     strategic: "Strategic",
-    disclaimer: "Disclaimer: This tool uses historical data and is currently in beta testing.",
+    disclaimer: "This tool uses historical data and is currently in beta testing.",
     howSliderWorks: "How the slider works",
     sliderBullet1: "When slider is at 0: Recommendations are based only on alignment with your priorities (not strategic).",
     sliderBullet2: "When slider is above 0: We use two lists — parties by alignment (your priorities) and parties by win probability in your district.",
@@ -47,7 +47,7 @@ const translations = {
     notFound: "Introuvable",
     matchBasedOnScores: "Correspondance selon les scores",
     strategic: "Stratégique",
-    disclaimer: "Avertissement : Cet outil utilise des données historiques et est en phase de test.",
+    disclaimer: "Cet outil utilise des données historiques et est en phase de test.",
     howSliderWorks: "Comment fonctionne le curseur",
     sliderBullet1: "À 0 : Les recommandations se basent uniquement sur l'alignement avec vos priorités (pas stratégique).",
     sliderBullet2: "Au-dessus de 0 : Nous utilisons deux listes — les partis par alignement (vos priorités) et les partis par probabilité de victoire dans votre circonscription.",
@@ -63,7 +63,7 @@ const translations = {
     useOneSlider: "Veuillez utiliser au moins un curseur (au moins 1).",
     ariaInfo: "Comment fonctionne le curseur de vote stratégique",
     close: "Fermer",
-    partyNames: ["Parti progressiste-conservateur", "NPD", "Libéral", "Parti vert"],
+    partyNames: ["Parti Ontario PC", "NPD", "Libéral", "Parti vert"],
   },
 } as const;
 
@@ -1058,8 +1058,8 @@ const ActiVote = () => {
       <header className="container py-4 md:py-6 flex items-center justify-between w-full">
         <a href="/" className="flex items-center">
           <img
-            src="/images/logo.png"
-            alt="The Action Pact Logo"
+            src={lang === "fr" ? "/images/newestfrenchlogo.png" : "/images/logo.png"}
+            alt={lang === "fr" ? "Le Pacte d'Action Logo" : "The Action Pact Logo"}
             className="h-24 md:h-32 w-auto object-contain"
           />
         </a>
@@ -1200,7 +1200,7 @@ const ActiVote = () => {
               </div>
               
               {/* Disclaimer */}
-              <p className={`font-medium text-primary mb-0 pt-0 -mt-3 text-center ${lang === "fr" ? "text-[15px] whitespace-nowrap" : "text-base sm:whitespace-nowrap"}`}>
+              <p className={`font-medium text-primary mb-0 pt-0 -mt-3 text-center ${lang === "fr" ? "text-[17px] whitespace-nowrap" : "text-lg sm:whitespace-nowrap"}`}>
                 {t.disclaimer}
               </p>
               </div>
@@ -1253,8 +1253,8 @@ const ActiVote = () => {
                 ) : (
                   <>
                     <div className="relative bg-gradient-to-br from-red-50 to-red-100 border-4 border-red-600 rounded-3xl pl-8 pr-8 pt-8 pb-8 md:pl-10 md:pr-10 md:pt-10 md:pb-10 shadow-[0_8px_40px_rgba(0,0,0,0.08)] mb-8 shrink-0">
-                      <div className={`absolute right-6 -rotate-6 border-2 border-red-600 bg-white/90 px-4 py-2 rounded shadow-sm ${lang === "fr" ? "top-24" : "top-8"}`} style={{ fontFamily: 'var(--font-display)' }}>
-                        <span className="text-2xl font-bold text-red-600">{t.yourTopMatch}</span>
+                      <div className={`absolute right-6 -rotate-6 border-2 border-red-600 bg-white/90 px-4 py-2 rounded shadow-sm ${lang === "fr" ? "top-8" : "top-8"}`} style={{ fontFamily: 'var(--font-display)' }}>
+                        <span className={`font-bold text-red-600 ${lang === "fr" ? "text-xl" : "text-2xl"}`}>{t.yourTopMatch}</span>
                       </div>
                       <p className={`text-6xl font-bold ${topParty.color} mb-2`}>
                         {t.partyNames[topPartyIndex]}
