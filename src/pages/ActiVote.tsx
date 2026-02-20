@@ -32,7 +32,7 @@ const translations = {
     useOneSlider: "Please use at least one slider to go to at least 1",
     ariaInfo: "How the strategic voting slider works",
     close: "Close",
-    partyNames: ["Progressive Conservative", "NDP", "Liberal", "Green"],
+    partyNames: ["Ontario PC Party", "NDP", "Liberal", "Green"],
   },
   fr: {
     scoreHeading: "Indiquez l'importance de chaque enjeu pour vous",
@@ -128,7 +128,7 @@ const ActiVote = () => {
 
 
   const parties = [
-    { name: "Progressive Conservative", candidateName: "Pierre Poilievre", color: "text-blue-700", partyCode: "PCP" },
+    { name: "Ontario PC Party", candidateName: "Pierre Poilievre", color: "text-blue-700", partyCode: "PCP" },
     { name: "NDP", candidateName: "Jagmeet Singh", color: "text-orange-600", partyCode: "NDP" },
     { name: "Liberal", candidateName: "Justin Trudeau", color: "text-red-600", partyCode: "LIB" },
     { name: "Green", candidateName: "Elizabeth May", color: "text-green-600", partyCode: "GPO" },
@@ -948,7 +948,7 @@ const ActiVote = () => {
   const alignedParties = alignedPartiesAll.filter((p) => eligibleIndicesSet.has(p.partyIndex));
 
   const strategicPartiesAll = districtProbabilities ? [
-    { partyIndex: 0, partyName: 'Progressive Conservative', probability: districtProbabilities.PCP ?? 0 },
+    { partyIndex: 0, partyName: 'Ontario PC Party', probability: districtProbabilities.PCP ?? 0 },
     { partyIndex: 1, partyName: 'NDP', probability: districtProbabilities.NDP ?? 0 },
     { partyIndex: 2, partyName: 'Liberal', probability: districtProbabilities.LIB ?? 0 },
     { partyIndex: 3, partyName: 'Green', probability: districtProbabilities.GPO ?? 0 },
