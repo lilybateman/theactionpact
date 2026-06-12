@@ -209,7 +209,7 @@ function Subscribe({ lang = 'EN' }) {
         style={{
           position: 'absolute', bottom: '-10px', right: '-110px',
           width: 'clamp(360px,48vw,680px)', height: 'clamp(380px,50vw,720px)',
-          backgroundImage: 'url(/images/subscribe-corner.png)',
+          backgroundImage: 'url(/images/subscribe-corner.webp)',
           backgroundSize: 'contain', backgroundRepeat: 'no-repeat',
           backgroundPosition: 'right bottom',
           transform: 'scaleX(-1)',

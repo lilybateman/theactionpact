@@ -83,7 +83,7 @@ function Tagline({ data }) {
 }
 
 function HeroLogo({ lang }) {
-  const src = lang === 'FR' ? '/images/newestfrenchlogo.png' : '/images/logo.png';
+  const src = lang === 'FR' ? '/images/newestfrenchlogo.webp' : '/images/logo.webp';
   return <img src={src} alt="The Action Pact" style={{ height: 'clamp(180px,28vw,420px)', width: 'auto', objectFit: 'contain', display: 'block', margin: '18px 0 8px' }} />;
 }
 
@@ -137,7 +137,7 @@ function Hero({ direction, lang }) {
   return (
     <section id="top" className="hero poster">
       <div className="photo">
-        <image-slot id="hero-photo" src="/images/hero-photo.png" fit="cover" radius="0"></image-slot>
+        <image-slot id="hero-photo" src="/images/hero-photo.webp" fit="cover" radius="0"></image-slot>
       </div>
       <div className="wrap">
         <Reveal className="kicker" tag="div">{hero.kicker}</Reveal>
@@ -171,7 +171,7 @@ function About({ lang = 'EN' }) {
           </Reveal>
         </div>
         <Reveal className="about-figure" delay={120}>
-          <img src="/images/about-photo.png" alt="" style={{ width: '100%', height: 'auto', display: 'block' }} />
+          <img src="/images/about-photo.webp" alt="" loading="lazy" style={{ width: '100%', height: 'auto', display: 'block' }} />
         </Reveal>
       </div>
     </section>
@@ -227,7 +227,7 @@ function ConversationClub({ lang = 'EN' }) {
 
   return (
     <section id="club" className="sec why" style={{ position: 'relative' }}>
-      <img src="/images/books.png" alt="" style={{ position: 'absolute', bottom: '50px', left: '-20px', width: 'clamp(160px, 18vw, 280px)', height: 'auto', pointerEvents: 'none' }} />
+      <img className="books-deco" src="/images/books.webp" alt="" loading="lazy" style={{ position: 'absolute', bottom: '50px', left: '-20px', width: 'clamp(160px, 18vw, 280px)', height: 'auto', pointerEvents: 'none' }} />
       <div className="wrap">
         <Reveal className="sec-eyebrow" tag="div">{isFR ? 'Printemps 2026' : 'Spring 2026'}</Reveal>
         <Reveal><h2 className="sec-head">{isFR ? 'Club de conversation' : 'Conversation Club'}</h2></Reveal>
@@ -237,7 +237,7 @@ function ConversationClub({ lang = 'EN' }) {
             <Reveal className="club-figure" delay={60}>
               <div style={{ position: 'relative', transform: 'rotate(-2deg)', display: 'inline-block', width: '72%', marginLeft: '8%', marginTop: '16px' }}>
                 <div style={{ position: 'relative', backgroundColor: 'var(--white)', backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.09'/%3E%3C/svg%3E\")", padding: '10px 10px 44px', boxShadow: '0 0 0 1px rgba(27,37,49,.1)' }}>
-                  <img src="/images/club-photo.png" alt="" style={{ width: '100%', height: 'auto', display: 'block', filter: 'sepia(0.35) saturate(0.85) contrast(1.2) brightness(1.08) hue-rotate(-8deg)' }} />
+                  <img src="/images/club-photo.webp" alt="" loading="lazy" style={{ width: '100%', height: 'auto', display: 'block', filter: 'sepia(0.35) saturate(0.85) contrast(1.2) brightness(1.08) hue-rotate(-8deg)' }} />
                   <div style={{ position: 'absolute', top: '10px', right: '10px', bottom: '44px', left: '10px', background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.28) 100%)', pointerEvents: 'none' }} />
                 </div>
               </div>
@@ -248,7 +248,7 @@ function ConversationClub({ lang = 'EN' }) {
             <p style={{ fontFamily: "'Newsreader', serif", fontSize: '17px', lineHeight: 1.6, color: 'var(--ink-soft)', margin: '18px 0 24px' }}>
               {isFR ? 'Cliquez ' : 'Click '}<button onClick={() => setOpen(true)} style={{ display: 'inline-flex', alignItems: 'center', background: 'var(--ink)', color: 'var(--paper)', border: 0, borderRadius: 0, padding: '4px 16px', fontFamily: "'Newsreader', serif", fontWeight: 600, fontSize: '16px', cursor: 'pointer', verticalAlign: 'middle', lineHeight: 1.3, textDecoration: 'underline', textDecorationColor: 'var(--orange)', textUnderlineOffset: '3px' }}>{isFR ? 'ici' : 'here'}</button>{isFR ? ' pour en savoir plus sur le lobbying et pourquoi nous avons choisi ce sujet, et pour accéder aux ressources pré-conversation.' : ' to read up on what lobbying is and why we chose it, and to access all the pre-conversation resources.'}
             </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'auto auto', gap: '20px', margin: '0 0 28px', justifyContent: 'start' }}>
+            <div className="club-events-grid" style={{ display: 'grid', gridTemplateColumns: 'auto auto', gap: '20px', margin: '0 0 28px', justifyContent: 'start' }}>
               {[{ city: 'Toronto', date: 'June 22nd @ 7pm', location: 'Danu Social House' }, { city: 'Montreal', date: 'June 26th @ 7pm', location: 'TBD' }].map(({ city, date, location }) => (
                 <div key={city} className="club-detail">
                   <div className="row"><span className="k" style={{ textDecoration: 'underline', textDecorationColor: 'var(--orange)', textUnderlineOffset: '4px' }}>{city}</span></div>
@@ -275,6 +275,7 @@ function ConversationClub({ lang = 'EN' }) {
 
       {/* Slide-in drawer */}
       <div
+        className="drawer-panel"
         style={{
           position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 200,
           width: '87vw',
@@ -286,7 +287,7 @@ function ConversationClub({ lang = 'EN' }) {
         }}
       >
         {/* Left scrollable content */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: 'clamp(16px,3vw,32px) clamp(32px,5vw,56px) clamp(32px,5vw,56px)' }}>
+        <div className="drawer-content" style={{ flex: 1, overflowY: 'auto', padding: 'clamp(16px,3vw,32px) clamp(32px,5vw,56px) clamp(32px,5vw,56px)' }}>
           <button
             onClick={() => setOpen(false)}
             style={{
@@ -296,7 +297,7 @@ function ConversationClub({ lang = 'EN' }) {
             }}
           >×</button>
           {/* Eyebrow */}
-          <p style={{ fontFamily: "'Spline Sans Mono', monospace", fontSize: '12px', letterSpacing: '.2em', textTransform: 'uppercase', color: 'var(--ink-soft)', margin: '0 0 6px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <p className="drawer-eyebrow-line" style={{ fontFamily: "'Spline Sans Mono', monospace", fontSize: '12px', letterSpacing: '.2em', textTransform: 'uppercase', color: 'var(--ink-soft)', margin: '0 0 6px', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ display: 'inline-block', width: '28px', height: '1.5px', background: 'var(--orange)' }}></span>
             {isFR ? 'Printemps 2026 · Lobbying' : 'Spring 2026 · Lobbying'}
           </p>
@@ -328,7 +329,7 @@ function ConversationClub({ lang = 'EN' }) {
             return (
               <>
                 {/* Audio | Video */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0', marginTop: '32px', borderTop: '2px solid var(--ink)', borderBottom: '2px solid var(--ink)' }}>
+                <div className="drawer-av-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0', marginTop: '32px', borderTop: '2px solid var(--ink)', borderBottom: '2px solid var(--ink)' }}>
                   <div style={{ paddingRight: '24px', borderRight: '2px solid var(--ink)', paddingTop: '16px', paddingBottom: '4px' }}>
                     <SectionLabel label={r.labels.audio} />
                     {r.audio.map((item, i) => <ResourceItem key={i} item={item} i={i} />)}
@@ -343,7 +344,7 @@ function ConversationClub({ lang = 'EN' }) {
                 <div style={{ marginTop: '32px' }}>
                   <SectionLabel label={r.labels.written} />
                   <div style={{ height: '2px', background: 'var(--ink)', margin: '8px 0 0' }} />
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0', borderBottom: '2px solid var(--ink)' }}>
+                  <div className="drawer-wc-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0', borderBottom: '2px solid var(--ink)' }}>
                     <div style={{ paddingRight: '24px', borderRight: '2px solid var(--ink)', paddingTop: '16px', paddingBottom: '4px' }}>
                       {r.written.map((item, i) => <ResourceItem key={i} item={item} i={i} />)}
                     </div>
@@ -371,8 +372,8 @@ function ConversationClub({ lang = 'EN' }) {
         </div>
 
         {/* Right image panel */}
-        <div style={{ width: '220px', flexShrink: 0, background: '#000', display: 'flex', alignItems: 'center', borderLeft: '4px solid #1b2531' }}>
-          <img src="/images/pre-conversation-photo.png" alt="" style={{ width: '100%', height: 'auto', display: 'block' }} />
+        <div className="drawer-photo-panel" style={{ width: '220px', flexShrink: 0, background: '#000', display: 'flex', alignItems: 'center', borderLeft: '4px solid #1b2531' }}>
+          <img src="/images/pre-conversation-photo.webp" alt="" loading="lazy" style={{ width: '100%', height: 'auto', display: 'block' }} />
         </div>
       </div>
     </section>
@@ -386,7 +387,7 @@ function Footer({ lang = 'EN' }) {
       <div className="wrap">
         <div className="foot-top">
           <button style={{ background: 'none', border: 0, padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'flex-end' }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="The Action Pact">
-            <img src={lang === 'FR' ? '/images/newestfrenchlogo.png' : '/images/logo.png'} alt="The Action Pact" style={{ height: '80px', width: 'auto', objectFit: 'contain' }} />
+            <img src={lang === 'FR' ? '/images/newestfrenchlogo.webp' : '/images/logo.webp'} alt="The Action Pact" style={{ height: '80px', width: 'auto', objectFit: 'contain' }} />
           </button>
           <nav className="foot-nav">
             {W.NAV[lang === 'FR' ? 'fr' : 'en'].map((n) => (
