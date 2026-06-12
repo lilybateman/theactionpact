@@ -151,9 +151,8 @@ function SubscribeForm({ lang = 'EN' }) {
   if (done) {
     return (
       <div className="success">
-        <p className="mark">{isFR ? "C'est fait !" : "You're in."}</p>
-        <p>{isFR ? "Merci de vous joindre à nous. Surveillez votre boîte de réception — l'infolettre est en route." : "Thanks for joining us. Keep an eye on your inbox — the newsletter is on its way."}</p>
-        <button className="again" onClick={() => setDone(false)}>{isFR ? "Inscrire une autre adresse" : "Sign up another address"}</button>
+        <p className="mark">{isFR ? "C'est fait !" : "You're in!"}</p>
+        <p>{isFR ? "Merci de vous joindre à nous." : "Thanks for joining us."}</p>
       </div>
     );
   }
